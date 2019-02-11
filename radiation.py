@@ -117,8 +117,8 @@ ta = api.TimeAxis(t_start, dt, n*24) # hours
 
 # soem station data
 lat = 44.0*math.pi/180# latitude
-slope_deg = 0.0
-aspect_deg = 0.0
+slope_deg = 90.0
+aspect_deg = 180.0
 slope = slope_deg*math.pi/180
 aspect = aspect_deg*math.pi/180
 albedo = 0.05
@@ -230,29 +230,29 @@ while (i<n):
         j+=1
     net_rad.append(netrad/23)
     swcalc_step1.append(swrad1)
-    print("--- 1-h step ---")
-    print("swrad1: ",swrad1)
+    # print("--- 1-h step ---")
+    # print("swrad1: ",swrad1)
     ra_rad.append(rarad/23)
     ra_rad1.append(rarad1)
-    print("rarad1: ", rarad1)
+    # print("rarad1: ", rarad1)
     # radtheorint_arr.append(ratheor_int/23)
-    print("--- 3-h step ---")
+    # print("--- 3-h step ---")
     swcalc_step3.append(swrad3)
-    print("swrad3: ", swrad3)
+    # print("swrad3: ", swrad3)
     radcalc_step3.append(rarad3)
-    print("rarad3: ", rarad3)
-    print(dayi)
-    print("-----------")
+    # print("rarad3: ", rarad3)
+    # print(dayi)
+    # print("-----------")
     time1 = ta.time(i*24)
     time = ta.time(i*24+23)
-    print("--- 24-h step ---")
+    # print("--- 24-h step ---")
     # print(time1)
     # print(time)
     radcaly24.net_radiation_step(radresy24, 44.0, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
-    print("swstep: ", radresy24.sw_radiation)
+    # print("swstep: ", radresy24.sw_radiation)
     swcalc_step24.append(radresy24.sw_radiation)
     radcalc_step24.append(radresy24.ra)
-    print("-----------")
+    # print("-----------")
     # print(ratheor_int/23)
     # print(rarad/23)
 
@@ -299,7 +299,7 @@ ax1.set_ylabel('Ra, Rso, [W/m^2]')
 ax1.set_xlabel('DOY')
 plt.title("Eugene, OR, surface slope 90 North")
 plt.legend(loc="upper left")
-plt.axis([0,365,0,600])
+plt.axis([0,365,0,120])
 plt.grid(True)
 plt.show()
 

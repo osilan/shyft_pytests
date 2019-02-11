@@ -6,8 +6,11 @@ import math
 # import matplotlib
 # matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
+import matplotlib.dates as mdates
 import matplotlib.mlab as mlab
 from netCDF4 import Dataset
+import datetime
+from dateutil.parser import parse
 
 # try to auto-configure the path. This will work in the case
 # that you have checked out the doc and data repositories
@@ -44,7 +47,7 @@ turbidity = 1.0
 tempP1 = 20.0 # [degC], real data should be used
 rhP1 = 50.0 #[%], real data should be used
 gsc = 1367
-
+utc = api.Calendar()
 
 print(" --------------------------------------------------------- ")
 print(" --- Single method test: must match the reference fig.1b, 3e,3g,3f --- ")
@@ -67,13 +70,16 @@ with open('csv_finse_initial.csv', mode='r') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     # mylist = list(csv_reader)
     line_count = 0
-    time = []
-    lwdown = []
-    lwup = []
+    timestr = []
+    timearr = []
+    timepyobj=[]
+    lw_down = []
+    lw_up = []
     atmp = []
     rh_2 = []
     sw_down = []
     sw_up =[]
+    sw_net = []
     air_temp_2 = []
     air_temp_10 = []
 
@@ -83,47 +89,112 @@ with open('csv_finse_initial.csv', mode='r') as csv_file:
             line_count += 1
         # print(f'\t{row} .')
         else:
-            time.append(row[csv_reader.fieldnames[0]])
-            lwdown.append(row["Rl_downwell"])
-            lwup.append(row["Rl_upwell"])
-            atmp.append(row["AT_mbar"])
-            rh_2.append(row["U_1477"])
-            print(row["time"])
-            print(row["Rs_downwell"])
+            # if row["time"]:
+            timestr.append(row["time"])
+            timeobj = parse(row["time"])
+            timepyobj.append(timeobj)
+            time = utc.time(timeobj.year, timeobj.month, timeobj.day, timeobj.hour,
+                            timeobj.minute, timeobj.second)
+            # print(time)
+            timearr.append(time)
+            if not row["Rl_downwell"]:
+                lwd=0.0
+            else:
+                lwd = float(row["Rl_downwell"])
+            lw_down.append(lwd)
+            if not row["Rl_upwell"]:
+                lwu=0.0
+            else:
+                lwu = float(row["Rl_upwell"])
+            lw_up.append(row["Rl_upwell"])
+            if not row["AT_mbar"]:
+                atp=0.0
+            else:
+                atp = float(row["AT_mbar"])
+            atmp.append(atp)
+            if not row["U_1477"]:
+                rh=0.0
+            else:
+                rh = float(row["U_1477"])
+            rh_2.append(rh)
             if not row["Rs_downwell"]:
                 swd = 0.0
-                print("empty")
             else:
                 swd = float(row["Rs_downwell"])
             sw_down.append(swd)
-            sw_up.append(row["Rs_upwell"])
-            air_temp_2.append("T_a_1477")
+            if not row["Rs_upwell"]:
+                swu = 0.0
+            else:
+                swu = float(row["Rs_upwell"])
+            sw_up.append(swu)
+            sw_net.append(swd-swu)
+            if not row["T_a_1477"]:
+                at = 0.0
+            else:
+                at = float(row["T_a_1477"])
+            air_temp_2.append(at)
             line_count += 1
     print(f'Processed {line_count} lines.')
-    print(time)
-    print(len(time))
-    print(sw_down)
+    # print(timestr)
+    print(len(timestr))
+    # print(sw_down)
 
+
+# # fig, (ax1,ax2) = plt.subplots(nrows=1,ncols=2, figsize=(7,5))
+# fig, ax1 = plt.subplots(figsize=(7,5))
+# fig.suptitle('Finse, Norway, measured data')
+# myFmt=mdates.DateFormatter('%Y-%M-%D %H:%M:%S')
+# ax1.plot(timepyobj,sw_down, 'r--', label='sw-downwell')
+# ax1.set_ylabel('Rsm, [W/m^2]')
+# ax1.set_xlabel('Date-time')
+# plt.gcf().autofmt_xdate()
+# # plt.gca().xaxis.set_major_formatter(myFmt)
+#
+# # ax1.legend(loc="upper left")
+# # plt.legend(loc="lower center")
+# # ax1.axis([0,365,-20,600])
+# ax1.grid(True)
+# # ax2.plot( sw_up, 'r--', label='sw-upwell')
+# # ax2.set_ylabel('Rsm, [W/m^2]')
+# # ax2.set_xlabel('number')
+# # ax1.legend(loc="upper left")
+# # plt.legend(loc="lower center")
+# # ax2.axis([0,365,-20,600])
+# # ax2.grid(True)
+# # plt.show()
+
+# processing data: I want to get only values for measurements between 2016-10-01 to 2016-10-22
+idxstart=timestr.index('2016-10-01 00:00:00')
+idxend=timestr.index('2016-10-22 00:00:00')
+idxstep=2
+times=timearr[idxstart:idxend:idxstep]
+timespy=timepyobj[idxstart:idxend:idxstep]
+print(times)
+sw_down_oct16=sw_down[idxstart:idxend:idxstep]
+print(sw_down_oct16)
+sw_up_oct16=sw_up[idxstart:idxend:idxstep]
+sw_net_oct16=sw_net[idxstart:idxend:idxstep]
+lw_down_oct16=lw_down[idxstart:idxend:idxstep]
+lw_up_oct16=lw_up[idxstart:idxend:idxstep]
+air_temp_2_oct16=air_temp_2[idxstart:idxend:idxstep]
+rh_2_oct16=rh_2[idxstart:idxend:idxstep]
+atmp_oct16=atmp[idxstart:idxend:idxstep]
 
 fig, ax1 = plt.subplots(figsize=(7,5))
-ax1.plot( sw_down, 'r--', label='sw-downwell')
-ax1.set_ylabel('Ra, Rso, [W/m^2]')
-ax1.set_xlabel('DOY')
-plt.title("Finse, Norway, measured data")
-plt.legend(loc="upper left")
-# plt.legend(loc="lower center")
-plt.axis([0,365,-20,600])
-plt.grid(True)
+fig.suptitle('Finse, Norway, measured data October 2016')
+myFmt=mdates.DateFormatter('%Y-%M-%D %H:%M:%S')
+ax1.plot(timespy,sw_down_oct16, 'r--', label='sw-downwell')
+ax1.set_ylabel('Rsm, [W/m^2]')
+ax1.set_xlabel('Date-time')
+plt.gcf().autofmt_xdate()
+ax1.grid(True)
 plt.show()
 
+# Will try to work withn data 2016-10-01 to 2016-10-22
+n = 22 # nr of days
+day = np.arange(n) # day of year
 
-# here I will try to reproduce the Fig.1b from Allen2006 (reference)
-utc = api.Calendar()
-
-n = 365 # nr of time steps: 1 year, daily data
-day = np.arange(n) # day of water year
-
-t_start = utc.time(2016, 9, 29) # starting at the beginning of the year 1970
+t_start = utc.time(2016, 10, 1) # starting at the beginning of the measurements 2010-10-01
 dtdays = api.deltahours(24) # returns daily timestep in seconds
 dt = api.deltahours(1) # returns daily timestep in seconds
 
