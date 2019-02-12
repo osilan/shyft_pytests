@@ -196,22 +196,22 @@ for i in range(n):
 
 
 # Let's plot the data we received from HbvSnow
-fig, ax1 = plt.subplots(figsize=(7,5))
-# ax2 = ax1.twinx()
-# ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-ax1.plot(doy, ET_ref_sim_d, 'ro-', label='ET_sim')
-# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-ax1.plot(doy, ET_os_daily, 'g.-', label='ET_os')
-ax1.plot(doy, ET_rs_daily, 'b.-', label='ET_rs')
-
-
-ax1.set_ylabel('ET_sim, ET_os, ET_rs [mm/day]')
-# ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
-ax1.set_xlabel('DOY')
-plt.title("Greeley, Colorado, daily time-step")
-plt.legend(loc="upper left")
-# plt.axis([0,365,0,10])
-plt.grid(True)
+# fig, ax1 = plt.subplots(figsize=(7,5))
+# # ax2 = ax1.twinx()
+# # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
+# ax1.plot(doy, ET_ref_sim_d, 'ro-', label='ET_sim')
+# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+# ax1.plot(doy, ET_os_daily, 'g.-', label='ET_os')
+# ax1.plot(doy, ET_rs_daily, 'b.-', label='ET_rs')
+#
+#
+# ax1.set_ylabel('ET_sim, ET_os, ET_rs [mm/day]')
+# # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
+# ax1.set_xlabel('DOY')
+# plt.title("Greeley, Colorado, daily time-step")
+# plt.legend(loc="upper left")
+# # plt.axis([0,365,0,10])
+# plt.grid(True)
 # plt.show()
 
 
@@ -223,6 +223,7 @@ height_ws = 3 # height of anemometer
 height_t = 1.68 # height of air temperature and rhumidity measurements
 surface_type = "irrigated grass"
 height_veg = 0.12 #vegetation height
+height_veg = 0.5 #tall
 atm_pres_mean = 85.17 #[kPa]
 psychrom_const = 0.0566
 windspeed_adj = 0.921
@@ -344,6 +345,7 @@ for i in range(nhour-1):
     pmch.reference_evapotranspiration_asce_st(pmrh,radrh.net_radiation*c_MJm2h2Wm2*(0.75+0.00002*elevation),temph_ts.v[i],rhh_ts.v[i],elevation,windspeedh_ts.v[i])
     # pmch.reference_evapotranspiration_asce_st(pmrh, radrh.net_radiation * c_MJm2h2Wm2 ,temph_ts.v[i], rhh_ts.v[i], elevation, windspeedh_ts.v[i])
     # pmch.reference_evapotranspiration_asce_full(pmrh,radrh.net_radiation*c_MJm2h2Wm2*(0.75+0.00002*elevation),temph_ts.v[i],rhh_ts.v[i],elevation,windspeedh_ts.v[i])
+    # pmch.reference_evapotranspiration_asce_full(pmrh, radrh.net_radiation * c_MJm2h2Wm2,temph_ts.v[i], rhh_ts.v[i], elevation, windspeedh_ts.v[i])
     # pmch.reference_evapotranspiration_asce_full(pmrh, Rnet_orig_h[i], temph_ts.v[i], rhh_ts.v[i], elevation,windspeedh_ts.v[i])
 
     print("======================")
@@ -355,50 +357,50 @@ for i in range(nhour-1):
     print(ET_pt_sim_h[i])
 
 # Let's plot the data we received from HbvSnow
-
-fig, ax1 = plt.subplots(figsize=(7,5))
-ax1.plot(timeofday, Rnet_sim_h, 'ro-', label='Rnet_sim')
-ax1.plot(timeofday, Rnet_orig_h, 'g.-', label='Rnet_orig')
-ax1.set_ylabel('Rnet_sim vs Rnet_orig [MJ/m2/h]')
-ax1.set_xlabel('DOY')
-plt.title("Greeley, Colorado, hourly time-step")
-plt.legend(loc="upper left")
-# plt.axis([0,365,0,10])
-plt.grid(True)
-
-fig, ax1 = plt.subplots(figsize=(7,5))
-ax1.plot(timeofday, Ra_sim_h, 'ro-', label='Ra_sim')
-ax1.plot(timeofday, Ra_orig_h, 'g.-', label='Ra_orig')
-ax1.set_ylabel('Ra_sim vs Ra_orig [MJ/m2/h]')
-ax1.set_xlabel('DOY')
-plt.title("Greeley, Colorado, hourly time-step")
-plt.legend(loc="upper left")
-# plt.axis([0,365,0,10])
-plt.grid(True)
 #
-fig, ax1 = plt.subplots(figsize=(7,5))
-# ax2 = ax1.twinx()
-ax1.plot(timeofday, SW_sim_h, 'ro-', label='SW_sim')
-# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-ax1.plot(timeofday, SW_orig_h, 'g.-', label='Sw_orig')
-ax1.set_ylabel('SW_sim vs SW_orig [MJ/m2/h]')
-ax1.set_xlabel('DOY')
-plt.title("Greeley, Colorado, hourly time-step")
-plt.legend(loc="upper left")
-# plt.axis([0,365,0,10])
-plt.grid(True)
+# fig, ax1 = plt.subplots(figsize=(7,5))
+# ax1.plot(timeofday, Rnet_sim_h, 'ro-', label='Rnet_sim')
+# ax1.plot(timeofday, Rnet_orig_h, 'g.-', label='Rnet_orig')
+# ax1.set_ylabel('Rnet_sim vs Rnet_orig [MJ/m2/h]')
+# ax1.set_xlabel('DOY')
+# plt.title("Greeley, Colorado, hourly time-step")
+# plt.legend(loc="upper left")
+# # plt.axis([0,365,0,10])
+# plt.grid(True)
 #
-fig, ax1 = plt.subplots(figsize=(7,5))
-# ax2 = ax1.twinx()
-ax1.plot(timeofday, LW_sim_h, 'ro-', label='LW_sim')
-# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-ax1.plot(timeofday, LW_orig_h, 'g.-', label='Lw_orig')
-ax1.set_ylabel('LW_sim vs LW_orig [MJ/m2/h]')
-ax1.set_xlabel('DOY')
-plt.title("Greeley, Colorado, hourly time-step")
-plt.legend(loc="upper left")
-# plt.axis([0,365,0,10])
-plt.grid(True)
+# fig, ax1 = plt.subplots(figsize=(7,5))
+# ax1.plot(timeofday, Ra_sim_h, 'ro-', label='Ra_sim')
+# ax1.plot(timeofday, Ra_orig_h, 'g.-', label='Ra_orig')
+# ax1.set_ylabel('Ra_sim vs Ra_orig [MJ/m2/h]')
+# ax1.set_xlabel('DOY')
+# plt.title("Greeley, Colorado, hourly time-step")
+# plt.legend(loc="upper left")
+# # plt.axis([0,365,0,10])
+# plt.grid(True)
+# #
+# fig, ax1 = plt.subplots(figsize=(7,5))
+# # ax2 = ax1.twinx()
+# ax1.plot(timeofday, SW_sim_h, 'ro-', label='SW_sim')
+# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+# ax1.plot(timeofday, SW_orig_h, 'g.-', label='Sw_orig')
+# ax1.set_ylabel('SW_sim vs SW_orig [MJ/m2/h]')
+# ax1.set_xlabel('DOY')
+# plt.title("Greeley, Colorado, hourly time-step")
+# plt.legend(loc="upper left")
+# # plt.axis([0,365,0,10])
+# plt.grid(True)
+# #
+# fig, ax1 = plt.subplots(figsize=(7,5))
+# # ax2 = ax1.twinx()
+# ax1.plot(timeofday, LW_sim_h, 'ro-', label='LW_sim')
+# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+# ax1.plot(timeofday, LW_orig_h, 'g.-', label='Lw_orig')
+# ax1.set_ylabel('LW_sim vs LW_orig [MJ/m2/h]')
+# ax1.set_xlabel('DOY')
+# plt.title("Greeley, Colorado, hourly time-step")
+# plt.legend(loc="upper left")
+# # plt.axis([0,365,0,10])
+# plt.grid(True)
 
 
 

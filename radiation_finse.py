@@ -140,32 +140,32 @@ with open('csv_finse_initial.csv', mode='r') as csv_file:
     # print(sw_down)
 
 
-# # fig, (ax1,ax2) = plt.subplots(nrows=1,ncols=2, figsize=(7,5))
-# fig, ax1 = plt.subplots(figsize=(7,5))
-# fig.suptitle('Finse, Norway, measured data')
-# myFmt=mdates.DateFormatter('%Y-%M-%D %H:%M:%S')
-# ax1.plot(timepyobj,sw_down, 'r--', label='sw-downwell')
-# ax1.set_ylabel('Rsm, [W/m^2]')
-# ax1.set_xlabel('Date-time')
-# plt.gcf().autofmt_xdate()
-# # plt.gca().xaxis.set_major_formatter(myFmt)
-#
-# # ax1.legend(loc="upper left")
-# # plt.legend(loc="lower center")
-# # ax1.axis([0,365,-20,600])
-# ax1.grid(True)
-# # ax2.plot( sw_up, 'r--', label='sw-upwell')
-# # ax2.set_ylabel('Rsm, [W/m^2]')
-# # ax2.set_xlabel('number')
-# # ax1.legend(loc="upper left")
-# # plt.legend(loc="lower center")
-# # ax2.axis([0,365,-20,600])
-# # ax2.grid(True)
-# # plt.show()
+# fig, (ax1,ax2) = plt.subplots(nrows=1,ncols=2, figsize=(7,5))
+fig, ax1 = plt.subplots(figsize=(7,5))
+fig.suptitle('Finse, Norway, measured data')
+myFmt=mdates.DateFormatter('%Y-%M-%D %H:%M:%S')
+ax1.plot(timepyobj,sw_net, 'r--', label='sw-downwell')
+ax1.set_ylabel('Rsm, [W/m^2]')
+ax1.set_xlabel('Date-time')
+plt.gcf().autofmt_xdate()
+# plt.gca().xaxis.set_major_formatter(myFmt)
+
+# ax1.legend(loc="upper left")
+# plt.legend(loc="lower center")
+# ax1.axis([0,365,-20,600])
+ax1.grid(True)
+# ax2.plot( sw_up, 'r--', label='sw-upwell')
+# ax2.set_ylabel('Rsm, [W/m^2]')
+# ax2.set_xlabel('number')
+# ax1.legend(loc="upper left")
+# plt.legend(loc="lower center")
+# ax2.axis([0,365,-20,600])
+# ax2.grid(True)
+# plt.show()
 
 # processing data: I want to get only values for measurements between 2016-10-01 to 2016-10-22
-idxstart=timestr.index('2016-10-01 00:00:00')
-idxend=timestr.index('2016-10-23 00:00:00')
+idxstart=timestr.index('2017-06-13 00:00:00')
+idxend=timestr.index('2017-07-10 00:00:00')
 idxstep=2
 times=timearr[idxstart:idxend:idxstep]
 timespy=timepyobj[idxstart:idxend:idxstep]
@@ -182,7 +182,7 @@ atmp_oct16=atmp[idxstart:idxend:idxstep]
 print(len(times))
 
 fig, ax1 = plt.subplots(figsize=(7,5))
-fig.suptitle('Finse, Norway, measured data October 2016')
+fig.suptitle('Finse, Norway, measured data June-July 2017')
 myFmt=mdates.DateFormatter('%Y-%M-%D %H:%M:%S')
 ax1.plot(timespy,sw_net_oct16, 'r--', label='sw-net')
 ax1.set_ylabel('Rsm, [W/m^2]')
@@ -192,10 +192,10 @@ ax1.grid(True)
 plt.show()
 
 # Will try to work withn data 2016-10-01 to 2016-10-22
-n = 22 # nr of days
+n = 25 # nr of days
 day = np.arange(n) # day of year
 
-t_start = utc.time(2016, 10, 1) # starting at the beginning of the measurements 2010-10-01
+t_start = utc.time(2017, 6, 13) # starting at the beginning of the measurements 2010-10-01
 dtdays = api.deltahours(24) # returns daily timestep in seconds
 dt = api.deltahours(1) # returns daily timestep in seconds
 
@@ -361,6 +361,8 @@ while (i<n):
     doy.append(dayi)
 
 
+print(sw_net_oct16[0:628])
+
 # Let's plot the data we received from HbvSnow
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
@@ -372,16 +374,17 @@ fig, ax1 = plt.subplots(figsize=(7,5))
 # ax1.plot(doy, swcalc_step1, 'k', label='Rso-1h-step')
 # ax1.plot(doy, radcalc_step24, 'y-.', label='Ra-24h-step')
 # ax1.plot(doy, swcalc_step24, 'y', label='Rso-24h-step')
-ax1.plot(sw_net_oct16[0:506], 'm--', label='Rsm net')
-ax1.plot(sw_simulated_1h, 'm', label='SW simulated net')
+ax1.plot(timespy[0:624],sw_net_oct16[0:624], 'mo', label='Rsm net')
+ax1.plot(timespy[0:575],sw_simulated_1h, 'm', label='SW simulated net')
 # plt.gcf().autofmt_xdate()
 ax1.set_ylabel('Ra, Rso, [W/m^2]')
 # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
 ax1.set_xlabel('Day-time')
-plt.title("Golden, CO, surface slope 90 N")
+plt.gcf().autofmt_xdate()
+plt.title("Finse, measured vs simulated SW net")
 plt.legend(loc="upper left")
 # plt.legend(loc="lower center")
-plt.axis([0,22,-100,500])
+# plt.axis([0,22,-100,800])
 plt.grid(True)
 plt.show()
 
