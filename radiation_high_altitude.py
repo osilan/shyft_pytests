@@ -251,14 +251,14 @@ while (i<n):
     j = 1
     # rsm = rahrad / 23
     rsm = 0.0
-    rahrad = 0.0
+    # rahrad = 0.0
     dd = 1 + 0.033 * math.cos(dayi * 2 * math.pi / 365)
     G = 2 * math.pi / 365 * (dayi - 1)
     declin = 0.006918 - 0.399912 * math.cos(G) + 0.070257 * math.sin(G) - 0.006758 * math.cos(
         2 * G) + 0.000907 * math.sin(2 * G) - 0.002697 * math.cos(3 * G) + 0.00148 * math.sin(3 * G)
     time1 = ta.time(i*24)
     time = ta.time(i*24+23)
-    print("--- 24-h step ---")
+    # print("--- 24-h step ---")
     radcaly24.net_radiation_step(radresy24, latitude, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
     # print("swstep: ", radresy24.sw_radiation)
     swcalc_step24.append(radresy24.sw_radiation)
@@ -275,19 +275,19 @@ while (i<n):
     # print(ra_theor/math.pi/2)
     # print(dd)
     rat_rad.append(ra_theor/math.pi/2)
-    rah_rad.append(rahrad / 23)
+    rah_rad.append(radresy24.rah)
     j = 1
     i+=1
     dayi += 1
-    print(dayi)
-    print("-----------------")
+    # print(dayi)
+    # print("-----------------")
     doy.append(dayi)
 
 
 # Let's plot the data we received from HbvSnow
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
-# ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
+ax1.plot(doy, rah_rad, 'g.-', label='Ratheor-integral')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
 ax1.plot(doy, radcalc_step24, 'y-.', label='Ra-24h-step')
 ax1.plot(doy, swcalc_step24, 'y', label='Rso-24h-step')

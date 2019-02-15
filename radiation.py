@@ -116,7 +116,8 @@ ta = api.TimeAxis(t_start, dt, n*24) # hours
 # print(len(ta))
 
 # soem station data
-lat = 44.0*math.pi/180# latitude
+latitude_deg = 44.0
+lat = latitude_deg*math.pi/180# latitude
 slope_deg = 90.0
 aspect_deg = 180.0
 slope = slope_deg*math.pi/180
@@ -173,6 +174,7 @@ omega1 = 0
 omega2 = 0
 rsm = 0
 rahrad = 0.0
+rah_rad24=[]
 
 while (i<n):
     netrad = 0.0
@@ -206,14 +208,14 @@ while (i<n):
                 time3 = ta.time(i*24+j*3)
             # print(time0)
             # print(time3)
-            radcaly3.net_radiation_step(radresy3, 44.0, time0, time3, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
+            radcaly3.net_radiation_step(radresy3, latitude_deg, time0, time3, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
             swrad3 += radresy3.sw_radiation
             rarad3 += radresy3.ra
         # print(time1)
         # print(time)
         # print("--------")
-        radcaly.net_radiation(radresy, 44.0, time1, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
-        radcaly1.net_radiation_step(radresy1, 44.0, time1, time2, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
+        radcaly.net_radiation(radresy, latitude_deg, time1, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
+        radcaly1.net_radiation_step(radresy1, latitude_deg, time1, time2, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
 
         # omega = 15*(j-12)*math.pi/180
         omega1 = radresy.sun_rise * math.pi / 180
@@ -248,7 +250,7 @@ while (i<n):
     # print("--- 24-h step ---")
     # print(time1)
     # print(time)
-    radcaly24.net_radiation_step(radresy24, 44.0, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
+    radcaly24.net_radiation_step(radresy24, latitude_deg, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
     # print("swstep: ", radresy24.sw_radiation)
     swcalc_step24.append(radresy24.sw_radiation)
     radcalc_step24.append(radresy24.ra)
@@ -274,6 +276,7 @@ while (i<n):
     # print(dd)
     rat_rad.append(ra_theor/math.pi/2)
     rah_rad.append(rahrad / 23)
+    rah_rad24.append(radresy24.rah)
     j = 1
     i+=1
     dayi += 1
@@ -284,7 +287,8 @@ while (i<n):
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
 # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-ax1.plot(doy, ra_rad, 'r--', label='Ra-instant')
+# ax1.plot(doy, rah_rad, 'r--', label='Ra-instant')
+# ax1.plot(doy, rah_rad24, 'm--', label='Ra-instant')
 ax1.plot(doy, net_rad, 'r', label='Rso-instant')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
 ax1.plot(doy, ra_rad1, 'k--', label='Ra-1h-step')

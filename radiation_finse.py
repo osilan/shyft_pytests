@@ -249,6 +249,7 @@ omega1 = 0
 omega2 = 0
 rsm = 0
 rahrad = 0.0
+rsmarr_average = []
 
 sw_simulated_1h = api.DoubleVector()
 
@@ -260,6 +261,7 @@ while (i<n):
     rarad1 = 0.0
     rarad3 = 0.0
     ratheor_int = 0.0
+    rsm_average = 0.0
     j = 1
     # rsm = rahrad / 23
     rsm = 0.0
@@ -274,11 +276,12 @@ while (i<n):
         time1 = ta.time(i*24+j-1)
         time2 = ta.time(i * 24 + j)
         tempP1= air_temp_2_oct16[i * 24 + j]
-        print("temperature: ", tempP1)
+        # print("temperature: ", tempP1)
         rhP1 = rh_2_oct16[i*24+j]
-        print("rhumidity: ",rhP1)
+        # print("rhumidity: ",rhP1)
         rsm = sw_net_oct16[i*24+j]
-        print("measured Rs: ", rsm)
+        rsm_average += rsm
+        # print("measured Rs: ", rsm)
         # print(time1)
         # print(time2)
         # if ((3*j)<24):
@@ -296,7 +299,7 @@ while (i<n):
         # print(time1)
         # print(time)
         # print("--------")
-        radcaly.net_radiation(radresy, latitude, time1, slope_deg, aspect_deg,tempP1, rhP1, elevation,rsm)
+        radcaly.net_radiation(radresy, latitude, time1, slope_deg, aspect_deg,tempP1, rhP1, elevation,0.0)
         radcaly1.net_radiation_step(radresy1, latitude, time1, time2, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
 
         # omega = 15*(j-12)*math.pi/180
@@ -313,8 +316,10 @@ while (i<n):
         rarad1 += radresy1.ra
         rahrad1 += radresy1.rah
         j+=1
-    net_rad.append(netrad/23)
-    swcalc_step1.append(swrad1)
+    rsmarr_average.append(rsm_average/23)
+    net_rad.append(netrad/23*(0.75+0.00002*elevation))
+    # net_rad.append(netrad / 23)
+    swcalc_step1.append(swrad1/23)
     # print("--- 1-h step ---")
     # print("swrad1: ",swrad1)
     ra_rad.append(rarad/23)
@@ -333,7 +338,8 @@ while (i<n):
     # print("--- 24-h step ---")
     # print(time1)
     # print(time)
-    radcaly24.net_radiation_step(radresy24, latitude, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
+    # print(rsm_average/23)
+    radcaly24.net_radiation_step(radresy24, latitude, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, (rsm_average/23))
     # print("swstep: ", radresy24.sw_radiation)
     swcalc_step24.append(radresy24.sw_radiation)
     radcalc_step24.append(radresy24.ra)
@@ -361,21 +367,22 @@ while (i<n):
     doy.append(dayi)
 
 
-print(sw_net_oct16[0:628])
+# print(sw_net_oct16[0:628])
 
 # Let's plot the data we received from HbvSnow
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
 # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
 # ax1.plot(doy, ra_rad, 'r--', label='Ra-instant')
-# ax1.plot(doy, net_rad, 'r', label='Rso-instant')
+ax1.plot(doy, net_rad, 'ro-', label='Rso-instant-daily-average')
+ax1.plot(doy, rsmarr_average, 'k.-', label='Rsmeasured-daily-average')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
 # ax1.plot(doy, ra_rad1, 'k--', label='Ra-1h-step')
-# ax1.plot(doy, swcalc_step1, 'k', label='Rso-1h-step')
+ax1.plot(doy, swcalc_step1, 'b.', label='Rso-1h-step')
 # ax1.plot(doy, radcalc_step24, 'y-.', label='Ra-24h-step')
 # ax1.plot(doy, swcalc_step24, 'y', label='Rso-24h-step')
-ax1.plot(timespy[0:624],sw_net_oct16[0:624], 'mo', label='Rsm net')
-ax1.plot(timespy[0:575],sw_simulated_1h, 'm', label='SW simulated net')
+# ax1.plot(timespy[0:624],sw_net_oct16[0:624], 'mo', label='Rsm net')
+# ax1.plot(timespy[0:575],sw_simulated_1h, 'm', label='SW simulated net')
 # plt.gcf().autofmt_xdate()
 ax1.set_ylabel('Ra, Rso, [W/m^2]')
 # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
