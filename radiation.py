@@ -120,6 +120,7 @@ latitude_deg = 44.0
 lat = latitude_deg*math.pi/180# latitude
 slope_deg = 90.0
 aspect_deg = 180.0
+plot_height = 120
 slope = slope_deg*math.pi/180
 aspect = aspect_deg*math.pi/180
 albedo = 0.05
@@ -287,7 +288,7 @@ while (i<n):
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
 # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-# ax1.plot(doy, rah_rad, 'r--', label='Ra-instant')
+ax1.plot(doy, ra_rad, 'r--', label='Ra-instant')
 # ax1.plot(doy, rah_rad24, 'm--', label='Ra-instant')
 ax1.plot(doy, net_rad, 'r', label='Rso-instant')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
@@ -303,7 +304,7 @@ ax1.set_ylabel('Ra, Rso, [W/m^2]')
 ax1.set_xlabel('DOY')
 plt.title("Eugene, OR, surface slope 90 North")
 plt.legend(loc="upper left")
-plt.axis([0,365,0,120])
+plt.axis([0,365,0,plot_height])
 plt.grid(True)
 plt.show()
 
