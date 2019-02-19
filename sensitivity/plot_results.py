@@ -1,4 +1,4 @@
-def plot_results(xvar, yvar, fig, ax1, ymax, xname,yname,plotname, lab, col,labloc):
+def plot_results(xvar, yvar, fig, ax1, ymax, xname,yname,plotname, lab, col,labloc,ymin=0.0):
     """ Plots things"""
 
     from matplotlib import pyplot as plt
@@ -9,6 +9,6 @@ def plot_results(xvar, yvar, fig, ax1, ymax, xname,yname,plotname, lab, col,labl
     ax1.set_xlabel(xname)
     plt.title(plotname)
     plt.legend(loc=labloc)
-    plt.axis([0, 365, 0, int(ymax*1.01)])
+    plt.axis([0, 365, ymin, int(ymax*1.01)])
     plt.grid(True)
     # plt.show()
