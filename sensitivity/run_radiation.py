@@ -118,5 +118,5 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
         dayi += 1
         doy.append(dayi)
 
-    return rv_sw_1h, rv_sw_3h, rv_sw_24h
+    return doy, rv_ra_1h, rv_sw_1h, rv_ra_3h, rv_sw_3h, rv_ra_24h, rv_sw_24h
 
