@@ -1,4 +1,4 @@
-from sensitivity import run_radiation
+import run_radiation
 
 latitude_deg = 44.0
 slope_deg = 90.0
@@ -10,4 +10,8 @@ temperature = 20.0 # [degC], real data should be used
 rhumidity = 50.0 #[%], real data should be used
 gsc = 1367
 
-run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity)
+
+result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity)
+
+print(type(result))
+print(result[1].net_radiation)
