@@ -1,27 +1,13 @@
-import os
-import sys
-import datetime as dt
-import numpy as np
-import math
-# import matplotlib
-# matplotlib.use('TkAgg')
-
-
-
-from shyft import api
-
-
 def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity):
 
-    # single method test
+    """Module creates shyft radiation model with different timesteps and run it for a defined period of time. """
 
-    print(" --------------------------------------------------------- ")
-    print(" --- Single method test: must match the reference fig.1b, 3e,3g,3f --- ")
-    print(" --- ref.: Allen, R. G.; Trezza, R. & Tasumi, M. -----------")
-    print(" Analytical integrated functions for daily solar radiation on ")
-    print(" slopes Agricultural and Forest Meteorology, 2006, 139, 55-73")
-    print(" --- Here we present plot with SW_radiation (Rso), W/m^2 --- ")
-    print(" --------------------------------------------------------- ")
+    import numpy as np
+    import math
+
+    from shyft import api
+
+    # single method test
 
     # here I will try to reproduce the Fig.1b from Allen2006 (reference)
     utc = api.Calendar()
@@ -32,6 +18,7 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
     t_start = utc.time(2002, 1, 1) # starting at the beginning of the year 1970
     dtdays = api.deltahours(24) # returns daily timestep in seconds
     dt = api.deltahours(1) # returns daily timestep in seconds
+    dtminutes = api.deltaminutes(15)
 
     # Let's now create Shyft time series from the supplied lists of precipitation and temperature.
     # First, we need a time axis, which is defined by a starting time, a time step and the number of time steps.
@@ -40,172 +27,96 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
     ta = api.TimeAxis(t_start, dt, n*24) # hours
     # print(len(ta))
 
-    # soem station data
-    # latitude_deg = 44.0
+    # converting station data
     lat = latitude_deg*math.pi/180# latitude
-    # slope_deg = 90.0
-    # aspect_deg = 180.0
     slope = slope_deg*math.pi/180
     aspect = aspect_deg*math.pi/180
-    # albedo = 0.05
-    # turbidity = 1.0
-    # elevation = 150.0
     tempP1 = temperature # [degC], real data should be used
     rhP1 = rhumidity #[%], real data should be used
     gsc = 1367
 
+    radparam = api.RadiationParameter(albedo,turbidity)
+    radcal_inst = api.RadiationCalculator(radparam)
+    radcal_1h = api.RadiationCalculator(radparam)
+    radcal_24h = api.RadiationCalculator(radparam)
+    radcal_3h = api.RadiationCalculator(radparam)
+    radres_inst = api.RadiationResponse()
+    radres_1h = api.RadiationResponse()
+    radres_24h = api.RadiationResponse()
+    radres_3h = api.RadiationResponse()
 
-
-
-    radparamy = api.RadiationParameter(albedo,turbidity)
-    radcaly = api.RadiationCalculator(radparamy)
-    radcaly1 = api.RadiationCalculator(radparamy)
-    radcaly24 = api.RadiationCalculator(radparamy)
-    radcaly3 = api.RadiationCalculator(radparamy)
-    radresy =api.RadiationResponse()
-    radresy1 =api.RadiationResponse()
-    radresy24 =api.RadiationResponse()
-    radresy3 =api.RadiationResponse()
-
-
-
-    # we now can simply run the routine step by step:
     try:
-        del net_rad
-        del ra_rad
-        del rah_rad
+        del rv_sw_inst
+        del rv_sw_1h
+        del rc_sw_3h
+        del rv_sw_24h
     except:
         pass
 
-    net_rad = api.DoubleVector()
-    swcalc_step1 = api.DoubleVector()
-    ra_rad = api.DoubleVector()
-    ra_rad1 = api.DoubleVector()
-    rah_rad = api.DoubleVector()
-    rat_rad = api.DoubleVector()
-    declin_arr = api.DoubleVector()
-    radtheorint_arr = api.DoubleVector()
-    swcalc_step24=api.DoubleVector()
-    radcalc_step24=api.DoubleVector()
-
-    swcalc_step3=api.DoubleVector()
-    radcalc_step3=api.DoubleVector()
+    rv_sw_inst = api.DoubleVector()
+    rv_sw_1h = api.DoubleVector()
+    rv_ra_inst = api.DoubleVector()
+    rv_ra_1h = api.DoubleVector()
+    rv_rah_inst = api.DoubleVector()
+    rv_sw_24h=api.DoubleVector()
+    rv_ra_24h=api.DoubleVector()
+    rv_sw_3h=api.DoubleVector()
+    rv_ra_3h=api.DoubleVector()
 
     i = 0
-    j = 1
     dayi = 0
     doy = api.DoubleVector()
-    omega1 = 0
-    omega2 = 0
-    rsm = 0
-    rahrad = 0.0
-    rah_rad24=[]
 
     while (i<n):
-        netrad = 0.0
-        swrad1 = 0.0
-        swrad3 = 0.0
-        rarad = 0.0
-        rarad1 = 0.0
-        rarad3 = 0.0
-        ratheor_int = 0.0
+        swrad_inst = 0.0
+        swrad_1h = 0.0
+        swrad_3h = 0.0
+        rarad_inst = 0.0
+        rarad_1h = 0.0
+        rarad_3h = 0.0
         j = 1
-        # rsm = rahrad / 23
         rsm = 0.0
-        rahrad = 0.0
-        rahrad1 = 0.0
-        dd = 1 + 0.033 * math.cos(dayi * 2 * math.pi / 365)
-        G = 2 * math.pi / 365 * (dayi - 1)
-        declin = 0.006918 - 0.399912 * math.cos(G) + 0.070257 * math.sin(G) - 0.006758 * math.cos(
-            2 * G) + 0.000907 * math.sin(2 * G) - 0.002697 * math.cos(3 * G) + 0.00148 * math.sin(3 * G)
-        # tmpra = api.DoubleVector()
+        rahrad_inst = 0.0
+        rahrad_1h = 0.0
         while (j<24):
             time1 = ta.time(i*24+j-1)
             time2 = ta.time(i * 24 + j)
-            # print(time1)
-            # print(time2)
             if ((3*j)<24):
                 time0 = ta.time(i * 24 + j*3-3)
-                # time3 = ta.time(i * 24 + j * 3 )
                 if (j>7):
                     time3 = ta.time(i*24+j*3-1)
                 else:
                     time3 = ta.time(i*24+j*3)
-                # print(time0)
-                # print(time3)
-                radcaly3.net_radiation_step(radresy3, latitude_deg, time0, time3, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
-                swrad3 += radresy3.sw_radiation
-                rarad3 += radresy3.ra
-            # print(time1)
-            # print(time)
-            # print("--------")
-            radcaly.net_radiation(radresy, latitude_deg, time1, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
-            radcaly1.net_radiation_step(radresy1, latitude_deg, time1, time2, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
+                radcal_3h.net_radiation_step(radres_3h, latitude_deg, time0, time3, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
+                swrad_3h += radres_3h.sw_radiation
+                rarad_3h += radres_3h.ra
+            radcal_inst.net_radiation(radres_inst, latitude_deg, time1, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
+            radcal_1h.net_radiation_step(radres_1h, latitude_deg, time1, time2, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
 
-            # omega = 15*(j-12)*math.pi/180
-            omega1 = radresy.sun_rise * math.pi / 180
-            omega2 = radresy.sun_set * math.pi / 180
-            # print(omega)
-            # print("omega1:", omega1)
-            netrad += radresy.sw_radiation
-            swrad1 += radresy1.sw_radiation
+            swrad_inst += radres_inst.sw_radiation
+            swrad_1h += radres_1h.sw_radiation
 
-            rarad += radresy.ra
-            rahrad += radresy.rah
-            rarad1 += radresy1.ra
-            rahrad1 += radresy1.rah
+            rarad_inst += radres_inst.ra
+            rahrad_inst += radres_inst.rah
+            rarad_1h += radres_1h.ra
+            rahrad_1h += radres_1h.rah
             j+=1
-        net_rad.append(netrad/23)
-        swcalc_step1.append(swrad1)
-        # print("--- 1-h step ---")
-        # print("swrad1: ",swrad1)
-        ra_rad.append(rarad/23)
-        ra_rad1.append(rarad1)
-        # print("rarad1: ", rarad1)
-        # radtheorint_arr.append(ratheor_int/23)
-        # print("--- 3-h step ---")
-        swcalc_step3.append(swrad3)
-        # print("swrad3: ", swrad3)
-        radcalc_step3.append(rarad3)
-        # print("rarad3: ", rarad3)
-        # print(dayi)
-        # print("-----------")
+        rv_sw_inst.append(swrad_inst/23)
+        rv_sw_1h.append(swrad_1h)
+        rv_ra_inst.append(rarad_inst/23)
+        rv_ra_1h.append(rarad_1h)
+        rv_sw_3h.append(swrad_3h)
+        rv_ra_3h.append(rarad_3h)
         time1 = ta.time(i*24)
-        time = ta.time(i*24+23)
-        # print("--- 24-h step ---")
-        # print(time1)
-        # print(time)
-        radcaly24.net_radiation_step(radresy24, latitude_deg, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
-        # print("swstep: ", radresy24.sw_radiation)
-        swcalc_step24.append(radresy24.sw_radiation)
-        radcalc_step24.append(radresy24.ra)
-        # print("-----------")
-        # print(ratheor_int/23)
-        # print(rarad/23)
-
-        # print(radresy.omega1)
-        # print(radresy.omega2)
-
-        declin_arr.append(declin*180/math.pi)
-        # print("declin: ", declin)
-        # print("lat: ", lat)
-        # print("slope: ", slope)
-        # print("aspect: ", aspect)
-        # print("omega1: ", omega1)
-        # print("omega2: ", omega2)
-        ra_theor = gsc*dd*(math.sin(declin)*math.sin(lat)*math.cos(slope)*(omega2-omega1)-math.sin(declin)*math.cos(lat)*math.sin(slope)*math.cos(aspect)*(omega2-omega1)+math.cos(declin)*math.cos(lat)*math.cos(slope)*(math.sin(omega2)-math.sin(omega1))+math.cos(declin)*math.sin(lat)*math.sin(slope)*math.cos(aspect)*(math.sin(omega2)-math.sin(omega1))-math.cos(declin)*math.sin(slope)*math.sin(aspect)*(math.cos(omega2)-math.cos(omega1)))
-        # ra_theor =  gsc * dd * (
-        #             math.sin(declin) * math.sin(lat) * math.cos(slope) * (omega2 - omega1)  + math.cos(declin) * math.cos(lat) * math.cos(
-        #         slope) * (math.sin(omega2) - math.sin(omega1)))
-        # print(ra_theor/math.pi/2)
-        # print(dd)
-        rat_rad.append(ra_theor/math.pi/2)
-        rah_rad.append(rahrad / 23)
-        rah_rad24.append(radresy24.rah)
+        time = ta.time(i*24+24-1)
+        radcal_24h.net_radiation_step(radres_24h, latitude_deg, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
+        rv_sw_24h.append(radres_24h.sw_radiation)
+        rv_ra_24h.append(radres_24h.ra)
+        rv_rah_inst.append(rahrad_inst / 23)
         j = 1
         i+=1
         dayi += 1
         doy.append(dayi)
 
-        return radresy, radresy1, radresy3, radresy24
+    return rv_sw_1h, rv_sw_3h, rv_sw_24h
 

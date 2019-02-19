@@ -14,4 +14,5 @@ gsc = 1367
 result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity)
 
 print(type(result))
-print(result[1].net_radiation)
+print(len(result[0]))
+print(result[0][1])
