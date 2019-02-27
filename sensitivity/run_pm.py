@@ -1,9 +1,12 @@
-def run_pm():
+def run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh):
     """Run Penman-Monteith evapotranspiration model from SHyFT"""
 
+    import numpy as np
+    import math
+    import shyft
     from shyft import api
 
-
+    utc = api.Calendar()
     # Single method test based on ASCE-EWRI Appendix C, hourly time-step
     latitude = 40.41
     longitude = 104.78
@@ -20,6 +23,9 @@ def run_pm():
     slope_deg = 0.0
     aspect_deg = 0.0
     lai = 2.0
+    c_MJm2d2Wm2 = 0.086400
+    c_MJm2h2Wm2 = 0.0036
+
 
 
     print(" --------------------------------------------------------- ")
@@ -45,16 +51,7 @@ def run_pm():
     tah = api.TimeAxis(t_starth, dthours, nhour) # days
     # print(len(tah))
 
-    # Data from weather station
-    ws_Th = [30.9, 31.2, 29.1, 28.3, 26.0, 22.9, 20.1, 19.9, 18.4, 16.5, 15.4, 15.5, 13.5, 13.2, 16.2, 20.0, 22.9, 26.4, 28.2, 29.8, 30.9, 31.8, 32.5, 32.9, 32.4, 30.2, 30.6, 28.3, 25.9, 23.9]
-    ws_eah = [1.09, 1.15, 1.21, 1.21, 1.13, 1.20, 1.35, 1.35, 1.32, 1.26, 1.34, 1.31, 1.26, 1.24, 1.31, 1.36, 1.39, 1.25, 1.17, 1.03, 1.02, 0.98, 0.87, 0.86, 0.93, 1.14, 1.27, 1.27, 1.17, 1.20]
-    ws_Rsh = [2.24, 1.65, 0.34, 0.32, 0.08, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.03, 0.46, 1.09, 1.74, 2.34, 2.84, 3.25, 3.21, 3.34, 2.96, 2.25, 1.35, 0.88, 0.79, 0.27, 0.03, 0.0]
-    ws_windspeedh = [4.07, 3.58, 1.15, 3.04, 2.21, 1.04, 0.58, 0.95, 0.30, 0.50, 1.00, 0.68, 0.69, 0.29, 1.24, 1.28, 0.88, 0.72, 1.52, 1.97, 2.07, 2.76, 2.90, 3.10, 2.77, 3.41, 2.78, 2.95, 3.27, 2.86]
 
-    ws_rhh = []
-    for i in range(len(ws_Th)):
-        ws_svp_tmean = 0.6108 * math.exp(17.27 * ws_Th[i] / (ws_Th[i] + 237.3))
-        ws_rhh.append(ws_eah[i]*100/ws_svp_tmean)
 
     # print(ws_rhh)
 
@@ -80,6 +77,9 @@ def run_pm():
     # Finally, we create shyft time-series as follows:
     # (Note: This step is not necessarily required to run the single methods.
     #  We could also just work with the double vector objects and the time axis)
+    instant = api.point_interpretation_policy.POINT_INSTANT_VALUE
+    average = api.point_interpretation_policy.POINT_AVERAGE_VALUE
+
     temph_ts = api.TimeSeries(tah, temph_dv, point_fx=instant)
     eah_ts = api.TimeSeries(tah, eah_dv, point_fx=instant)
     rsh_ts = api.TimeSeries(tah, rsh_dv, point_fx=instant)
@@ -145,3 +145,4 @@ def run_pm():
         ET_pt_sim_h.append(ptc.potential_evapotranspiration(temph_ts.v[i], SW_orig_h[i]/c_MJm2h2Wm2,rhh_ts.v[i] * 0.01) * 3600)  # the PT calculates [mm/s]
         print(ET_pt_sim_h[i])
 
+    return ET_ref_sim_h
