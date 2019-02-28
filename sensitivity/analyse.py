@@ -207,23 +207,61 @@ gsc = 1367
 #     i+=1
 # plt.show()
 
-aspect_array = [-90.0, 0.0, 90.0, 180] # S, EW, N
-slope_deg = 90.0
-ymax = 350
-ymin = -20
+# aspect_array = [-90.0, 0.0, 90.0, 180] # S, EW, N
+# slope_deg = 90.0
+# ymax = 350
+# ymin = -20
+# yname = 'Rso, [W/m^2]'
+# xname = 'DOY'
+# plotname = "Eugene, OR, surface slope: "+str(slope_deg)+orient+ "Aspect dependency"
+# labels = ('Ra','Rso')
+# colors = ('r--','r', 'b-.','b','g--','g','k--','k','m--','m','y--','y')
+# labloc = ("upper left","lower center", "upper center","lower left")
+#
+# fig1, ax1 = plt.subplots(figsize=(7, 5))
+# i = 0
+# for aspect in aspect_array:
+#     result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect, elevation, albedo, turbidity, temperature, rhumidity)
+#     # plot_results.plot_results(result[0], result[1], fig1, ax1, ymax, xname, yname, plotname, labels[0], colors[0])  # 1h
+#     plot_results.plot_results(result[0], result[2], fig1, ax1, ymax, xname, yname, plotname, str(aspect), colors[i],labloc[3],ymin) # 1h
+#     # colors = ('b--','b')
+#     # plot_results.plot_results(result[0],result[3],result[4], fig1, ax1, ymax, xname, yname, plotname, labels, colors[i]) # 3h
+#     # colors = ('k--','k')
+#     # plot_results.plot_results(result[0],result[5],result[6], fig1, ax1, ymax, xname, yname, plotname, labels, colors[i]) # 24h
+#     i+=1
+# plt.show()
+
+# slope_array = [0.0, 45.0, 90.0]
+slope_array = [90.0]
+ymax = 450
 yname = 'Rso, [W/m^2]'
 xname = 'DOY'
-plotname = "Eugene, OR, surface slope: "+str(slope_deg)+orient+ "Aspect dependency"
+plotname = "Eugene, OR, "+orient+ "Slope dependency"
 labels = ('Ra','Rso')
-colors = ('r--','r', 'b-.','b','g--','g','k--','k','m--','m','y--','y')
-labloc = ("upper left","lower center", "upper center","lower left")
+
+colors1 = ('r--','b--', 'm--','k--','g--')
+colors = ('r','b','m','k','g')
+labloc = ("upper left","lower center", "upper center")
 
 fig1, ax1 = plt.subplots(figsize=(7, 5))
 i = 0
-for aspect in aspect_array:
-    result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect, elevation, albedo, turbidity, temperature, rhumidity)
-    # plot_results.plot_results(result[0], result[1], fig1, ax1, ymax, xname, yname, plotname, labels[0], colors[0])  # 1h
-    plot_results.plot_results(result[0], result[2], fig1, ax1, ymax, xname, yname, plotname, str(aspect), colors[i],labloc[3],ymin) # 1h
+for slope in slope_array:
+    result = run_radiation.run_radiation(latitude_deg, slope, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity)
+    # plot_results.plot_results(result[0], result[1], fig1, ax1, ymax, xname, yname, plotname, labels[0], colors[0], labloc[1])  # 1h
+    plot_results.plot_results(result[0], result[1], fig1, ax1, ymax, xname, yname, plotname, 'Ra-1h', colors1[0],labloc[1])  # 1h
+    plot_results.plot_results(result[0], result[3], fig1, ax1, ymax, xname, yname, plotname, 'Ra-3h', colors1[1],
+                              labloc[1])  # 1h
+    plot_results.plot_results(result[0], result[5], fig1, ax1, ymax, xname, yname, plotname, 'Ra-24h', colors1[2],
+                              labloc[1])  # 1h
+    plot_results.plot_results(result[0], result[7], fig1, ax1, ymax, xname, yname, plotname, 'Ra-inst', colors1[3],labloc[1])  # inst
+    plot_results.plot_results(result[0], result[2], fig1, ax1, ymax, xname, yname, plotname, 'Rso-1h', colors[0],
+                              labloc[1])  # 1h
+    plot_results.plot_results(result[0], result[4], fig1, ax1, ymax, xname, yname, plotname, 'Rso-3h', colors[1],
+                              labloc[1])  # 1h
+    plot_results.plot_results(result[0], result[6], fig1, ax1, ymax, xname, yname, plotname, 'Rso-24h', colors[2],
+                              labloc[1])  # 1h
+    plot_results.plot_results(result[0], result[8], fig1, ax1, ymax, xname, yname, plotname, 'Rso-inst', colors[3],
+                              labloc[1])  # inst
     # colors = ('b--','b')
     # plot_results.plot_results(result[0],result[3],result[4], fig1, ax1, ymax, xname, yname, plotname, labels, colors[i]) # 3h
     # colors = ('k--','k')

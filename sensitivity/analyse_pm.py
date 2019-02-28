@@ -6,9 +6,9 @@ import math
 latitude_deg = 44.0
 slope_deg = 90.0
 aspect_deg = 0.0
-orient=" South. "
+orient = " South. "
 if aspect_deg>=180:
-    orient=" North. "
+    orient = " North. "
 albedo = 0.05
 turbidity = 1.0
 elevation = 150.0

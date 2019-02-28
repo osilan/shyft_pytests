@@ -108,19 +108,22 @@ t_start = utc.time(2002, 1, 1) # starting at the beginning of the year 1970
 dtdays = api.deltahours(24) # returns daily timestep in seconds
 dt = api.deltahours(1) # returns daily timestep in seconds
 
+
 # Let's now create Shyft time series from the supplied lists of precipitation and temperature.
 # First, we need a time axis, which is defined by a starting time, a time step and the number of time steps.
 tadays = api.TimeAxis(t_start, dtdays, n) # days
 # print(len(tadays))
 ta = api.TimeAxis(t_start, dt, n*24) # hours
+dtmin = api.deltaminutes(60)
+tamin = api.TimeAxis(t_start, dtmin, n*24*60) # minutes
 # print(len(ta))
 
 # soem station data
 latitude_deg = 44.0
 lat = latitude_deg*math.pi/180# latitude
 slope_deg = 90.0
-aspect_deg = 180.0
-plot_height = 120
+aspect_deg = 0.0
+plot_height = 350
 slope = slope_deg*math.pi/180
 aspect = aspect_deg*math.pi/180
 albedo = 0.05
@@ -154,6 +157,8 @@ except:
     pass
 
 net_rad = api.DoubleVector()
+sw_rad_inst_all = []
+sw_rad_inst_all_steps = []
 swcalc_step1 = api.DoubleVector()
 ra_rad = api.DoubleVector()
 ra_rad1 = api.DoubleVector()
@@ -211,11 +216,15 @@ while (i<n):
             # print(time3)
             radcaly3.net_radiation_step(radresy3, latitude_deg, time0, time3, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
             swrad3 += radresy3.sw_radiation
+
             rarad3 += radresy3.ra
         # print(time1)
         # print(time)
         # print("--------")
         radcaly.net_radiation(radresy, latitude_deg, time1, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
+        sw_rad_inst_all.append(radresy.sw_radiation)
+        sw_rad_inst_all_steps.append(radresy.sw_radiation)
+
         radcaly1.net_radiation_step(radresy1, latitude_deg, time1, time2, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
 
         # omega = 15*(j-12)*math.pi/180
@@ -231,7 +240,10 @@ while (i<n):
         rarad1 += radresy1.ra
         rahrad1 += radresy1.rah
         j+=1
-    net_rad.append(netrad/23)
+    # net_rad.append(netrad/23)
+    net_rad.append(sum(sw_rad_inst_all)/len(sw_rad_inst_all))
+    print(len(sw_rad_inst_all))
+    sw_rad_inst_all.clear()
     swcalc_step1.append(swrad1)
     # print("--- 1-h step ---")
     # print("swrad1: ",swrad1)
@@ -284,27 +296,29 @@ while (i<n):
     doy.append(dayi)
 
 
+
 # Let's plot the data we received from HbvSnow
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
+ax1.plot(sw_rad_inst_all_steps,'r.')
 # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-ax1.plot(doy, ra_rad, 'r--', label='Ra-instant')
-# ax1.plot(doy, rah_rad24, 'm--', label='Ra-instant')
-ax1.plot(doy, net_rad, 'r', label='Rso-instant')
-# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-ax1.plot(doy, ra_rad1, 'k--', label='Ra-1h-step')
-ax1.plot(doy, swcalc_step1, 'k', label='Rso-1h-step')
-ax1.plot(doy, radcalc_step3, 'b--', label='Ra-3h-step')
-ax1.plot(doy, swcalc_step3, 'b', label='Rso-3h-step')
-ax1.plot(doy, radcalc_step24, 'y-.', label='Ra-24h-step')
-ax1.plot(doy, swcalc_step24, 'y', label='Rso-24h-step')
+# ax1.plot(doy, ra_rad, 'r--', label='Ra-instant')
+# # ax1.plot(doy, rah_rad24, 'm--', label='Ra-instant')
+# ax1.plot(doy, net_rad, 'r', label='Rso-instant')
+# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+# ax1.plot(doy, ra_rad1, 'k--', label='Ra-1h-step')
+# ax1.plot(doy, swcalc_step1, 'k', label='Rso-1h-step')
+# ax1.plot(doy, radcalc_step3, 'b--', label='Ra-3h-step')
+# ax1.plot(doy, swcalc_step3, 'b', label='Rso-3h-step')
+# ax1.plot(doy, radcalc_step24, 'y-.', label='Ra-24h-step')
+# ax1.plot(doy, swcalc_step24, 'y', label='Rso-24h-step')
 
-ax1.set_ylabel('Ra, Rso, [W/m^2]')
-# ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
-ax1.set_xlabel('DOY')
-plt.title("Eugene, OR, surface slope 90 North")
-plt.legend(loc="upper left")
-plt.axis([0,365,0,plot_height])
+# ax1.set_ylabel('Ra, Rso, [W/m^2]')
+# # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
+# ax1.set_xlabel('DOY')
+# plt.title("Eugene, OR, surface slope 90 North")
+# plt.legend(loc="upper left")
+# plt.axis([0,365,0,plot_height])
 plt.grid(True)
 plt.show()
 
