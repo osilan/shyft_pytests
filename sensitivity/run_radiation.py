@@ -41,8 +41,8 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
         doy.append(dayi)
         k += 1
         dayi += 1
-    rv_sw = []
-    rv_ra = []
+    rv_rso = [] # clear-sky radiation, result vector
+    rv_ra = [] # extraterrestrial radiation, result vector
     if flag=='24-hour':
         dayi = 0
         doy = api.DoubleVector()
@@ -54,7 +54,7 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
         while (k<=n):
             time1 = tadays.time(k-1)
             radcal_24h.net_radiation_step(radres_24h, latitude_deg, time1, step, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
-            rv_sw.append(radres_24h.sw_radiation)
+            rv_rso.append(radres_24h.clear_sky)
             rv_ra.append(radres_24h.ra)
             print(radres_24h.ra)
             doy.append(dayi)
@@ -66,60 +66,60 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
         # running 3h timestep
         step = api.deltahours(3)
         ta3 = api.TimeAxis(t_start, step, n * 8)  # hours, 1h timestep
-        swrad_3h = []
-        rarad_3h = []
+        rso_3h = [] #clear-sky radiation
+        ra_3h = [] # extraterrestrial radiation
         k = 1
         while (k<n*8):
             time0 = ta3.time(k-1)
             radcal_3h.net_radiation_step(radres_3h, latitude_deg, time0, step, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
-            swrad_3h.append(radres_3h.sw_radiation)
-            rarad_3h.append(radres_3h.ra)
+            rso_3h.append(radres_3h.clear_sky)
+            ra_3h.append(radres_3h.ra)
             k+=1
-        rv_sw = [sum(swrad_3h[i:i + 8]) for i in range(0, len(swrad_3h), 8)]
-        rv_ra = [sum(rarad_3h[i:i + 8]) for i in range(0, len(rarad_3h), 8)]
+        rv_rso = [sum(rso_3h[i:i + 8]) for i in range(0, len(rso_3h), 8)]
+        rv_ra = [sum(ra_3h[i:i + 8]) for i in range(0, len(ra_3h), 8)]
     elif flag=='1-hour':
         # runing 1h timestep
         step = api.deltahours(1)
         ta = api.TimeAxis(t_start, step, n * 24)  # hours, 1h timestep
-        swrad_1h = []
-        rarad_1h = []
-        rahrad_1h = []
+        rso_1h = []
+        ra_1h = []
+        # rah_1h = []
         k = 1
         while (k<n*24):
             time1 = ta.time(k-1)
             radcal_1h.net_radiation_step(radres_1h, latitude_deg, time1, step, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
-            swrad_1h.append(radres_1h.sw_radiation)
-            rarad_1h.append(radres_1h.ra)
-            rahrad_1h.append(radres_1h.rah)
+            rso_1h.append(radres_1h.clear_sky)
+            ra_1h.append(radres_1h.ra)
+            # rah_1h.append(radres_1h.rah)
             k += 1
-        rv_sw = [sum(swrad_1h[i:i + 24]) for i in range(0, len(swrad_1h), 24)]
-        rv_ra = [sum(rarad_1h[i:i + 24]) for i in range(0, len(rarad_1h), 24)]
+        rv_rso = [sum(rso_1h[i:i + 24]) for i in range(0, len(rso_1h), 24)]
+        rv_ra = [sum(ra_1h[i:i + 24]) for i in range(0, len(ra_1h), 24)]
     elif flag=='instant':
         # running instantaneous with dmin timstep
         minutes = 60
         dmin = 1
         step = api.deltaminutes(dmin)
         tamin = api.TimeAxis(t_start,step , n * 24 * minutes)
-        swrad_inst = []
-        rarad_inst = []
-        rahrad_inst = []
+        rso_inst = []
+        ra_inst = []
+        # rah_inst = []
         doy1 = []
         k = 0
         while (k < n*24*minutes):
             timemin = tamin.time(k)
             radcal_inst.net_radiation(radres_inst, latitude_deg, timemin, slope_deg, aspect_deg, tempP1, rhP1,
                                       elevation, rsm)
-            swrad_inst.append(radres_inst.sw_radiation)
-            rarad_inst.append(radres_inst.ra)
-            rahrad_inst.append(radres_inst.rah)
+            rso_inst.append(radres_inst.clear_sky)
+            ra_inst.append(radres_inst.ra)
+            # rah_inst.append(radres_inst.rah)
             doy1.append(k)
             k += 1
-        rv_sw = [sum(swrad_inst[i:i+24*minutes])//(24*minutes) for i in range(0,len(swrad_inst),24*minutes)]
-        rv_ra = [sum(rarad_inst[i:i + 24 * minutes]) // (24 * minutes) for i in range(0, len(rarad_inst), 24 * minutes)]
+        rv_rso = [sum(rso_inst[i:i+24*minutes])/(24*minutes) for i in range(0,len(rso_inst),24*minutes)]
+        rv_ra = [sum(ra_inst[i:i + 24 * minutes]) /(24 * minutes) for i in range(0, len(ra_inst), 24 * minutes)]
     else:
         return 'Nothing todo. Please, specify timestep'
 
 
 
-    return doy, rv_ra, rv_sw
+    return doy, rv_ra, rv_rso
 
