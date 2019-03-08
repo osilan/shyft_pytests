@@ -41,7 +41,7 @@ radcal = api.RadiationCalculator(radparam)
 radresponse =api.RadiationResponse();
 time = api.utctime_now()
 radcal.net_radiation(radresponse, 40.4, time, 0.0, 0.0, 20.0, 40.0, 150.0, 0.0);
-print(radresponse.net_radiation)
+print(radresponse.net)
 
 pmparam=api.PenmanMonteithParameter(2.0,2.0,2.0, 0.12,144.0)
 pmcalculator=api.PenmanMonteithCalculator(pmparam)
@@ -52,7 +52,7 @@ rhumidity = 40.0
 elevation = 150.0
 windspeed = 1.0
 
-pmcalculator.reference_evapotranspiration_asce_full(pmresponse,radresponse.net_radiation,temperature,rhumidity,elevation,windspeed)
+pmcalculator.reference_evapotranspiration_asce_full(pmresponse,radresponse.net,temperature,rhumidity,elevation,windspeed)
 print(pmresponse.et_ref)
 
 
@@ -183,10 +183,10 @@ for i in range(n):
     print("RHmean: ", rhmean_ts.v[i])
     radc.net_radiation_step_asce_st(radr, latitude, tadays.time(i), t_end,slope_deg, aspect_deg, tempmean_ts.v[i], rhmean_ts.v[i], elevation, rs_ts.v[i]/c_MJm2d2Wm2)
     print("Ra: ", radr.ra*c_MJm2d2Wm2 )
-    print("Rso: ", radr.sw_radiation*c_MJm2d2Wm2 )
-    print("LW: ", radr.lw_radiation*c_MJm2d2Wm2 )
-    print("RNet: ", radr.net_radiation*c_MJm2d2Wm2 )
-    pmc.reference_evapotranspiration_asce_full(pmr,radr.net_radiation*c_MJm2d2Wm2 ,tempmean_ts.v[i],rhmean_ts.v[i],elevation,windspeed_ts.v[i])
+    print("Rso: ", radr.net_sw*c_MJm2d2Wm2 )
+    print("LW: ", radr.net_lw*c_MJm2d2Wm2 )
+    print("RNet: ", radr.net*c_MJm2d2Wm2 )
+    pmc.reference_evapotranspiration_asce_full(pmr,radr.net*c_MJm2d2Wm2 ,tempmean_ts.v[i],rhmean_ts.v[i],elevation,windspeed_ts.v[i])
     print("======================")
     print("ET_ref: ", pmr.et_ref)
     ET_ref_sim_d.append(pmr.et_ref)
@@ -224,7 +224,7 @@ height_ws = 3 # height of anemometer
 height_t = 1.68 # height of air temperature and rhumidity measurements
 surface_type = "irrigated grass"
 height_veg = 0.12 #vegetation height
-height_veg = 0.5 #tall
+# height_veg = 0.5 #tall
 if height_veg>0.12:
     crop="tall"
 else:
@@ -333,24 +333,24 @@ Ra_sim_h = []
 Rnet_sim_h = []
 
 for i in range(nhour-1):
-    print(i)
-    print("======================")
-    print("time: ", tah.time(i))
+    # print(i)
+    # print("======================")
+    # print("time: ", tah.time(i))
     timeofday.append(datetime.fromtimestamp(tah.time(i)))
-    print(datetime.fromtimestamp(tah.time(i)))
-    print("Th: ", temph_ts.v[i])
-    print("RHh: ", rhh_ts.v[i])
-    radch.net_radiation_step_asce_st(radrh, latitude, tah.time(i), api.deltahours(1),slope_deg, aspect_deg, temph_ts.v[i], rhh_ts.v[i], elevation, rsh_ts.v[i]/c_MJm2h2Wm2 )
-    # radch.net_radiation_step(radrh, latitude, tah.time(i), api.deltahours(1), slope_deg, aspect_deg, temph_ts.v[i],rhh_ts.v[i], elevation, rsh_ts.v[i] / c_MJm2h2Wm2)
-    print("Ra: ", radrh.ra*c_MJm2h2Wm2)
+    # print(datetime.fromtimestamp(tah.time(i)))
+    # print("Th: ", temph_ts.v[i])
+    # print("RHh: ", rhh_ts.v[i])
+    # radch.net_radiation_step_asce_st(radrh, latitude, tah.time(i), api.deltahours(1),slope_deg, aspect_deg, temph_ts.v[i], rhh_ts.v[i], elevation, rsh_ts.v[i]/c_MJm2h2Wm2 )
+    radch.net_radiation_step(radrh, latitude, tah.time(i), api.deltahours(1), slope_deg, aspect_deg, temph_ts.v[i],rhh_ts.v[i], elevation, rsh_ts.v[i] / c_MJm2h2Wm2)
+    # print("Ra: ", radrh.ra*c_MJm2h2Wm2)
     Ra_sim_h.append(radrh.ra*c_MJm2h2Wm2*24 )
-    print("Rs input:", rsh_ts.v[i]/c_MJm2h2Wm2)
-    print("Rso: ", radrh.clear_sky)
-    Rso_sim_h.append(radrh.clear_sky * c_MJm2h2Wm2)
+    # print("Rs input:", rsh_ts.v[i]/c_MJm2h2Wm2)
+    # print("Rso: ", radrh.sw_t)
+    Rso_sim_h.append(radrh.sw_t * c_MJm2h2Wm2)
     SW_sim_h.append(radrh.net_sw*c_MJm2h2Wm2)
-    print("LW: ", -radrh.net_lw*c_MJm2h2Wm2)
-    LW_sim_h.append(-radrh.net_lw*c_MJm2h2Wm2)
-    print("RNet: ", radrh.net*c_MJm2h2Wm2 )
+    print("LW: ", radrh.net_lw*c_MJm2h2Wm2)
+    LW_sim_h.append(radrh.net_lw*c_MJm2h2Wm2)
+    # print("RNet: ", radrh.net*c_MJm2h2Wm2 )
     # Rnet_sim_h.append(radrh.net*c_MJm2h2Wm2*(0.75+0.00002*elevation))
     Rnet_sim_h.append(radrh.net * c_MJm2h2Wm2 )
     # pmch.reference_evapotranspiration_asce_st(pmrh,Rnet_orig_h[i],temph_ts.v[i],rhh_ts.v[i],elevation,windspeedh_ts.v[i])
@@ -360,13 +360,13 @@ for i in range(nhour-1):
     # pmch.reference_evapotranspiration_asce_full(pmrh, radrh.net * c_MJm2h2Wm2,temph_ts.v[i], rhh_ts.v[i], elevation, windspeedh_ts.v[i])
     # pmch.reference_evapotranspiration_asce_full(pmrh, Rnet_orig_h[i], temph_ts.v[i], rhh_ts.v[i], elevation,windspeedh_ts.v[i])
 
-    print("======================")
-    print("ET_ref: ", pmrh.et_ref)
+    # print("======================")
+    # print("ET_ref: ", pmrh.et_ref)
     ET_ref_sim_h.append(pmrh.et_ref)
-    print("======================")
+    # print("======================")
     # ET_pt_sim_h.append(ptc.potential_evapotranspiration(temph_ts.v[i], radrh.rnet, rhh_ts.v[i]*0.01)*3600) # the PT calculates [mm/s]
     ET_pt_sim_h.append(ptc.potential_evapotranspiration(temph_ts.v[i], ws_Rsh[i]/c_MJm2h2Wm2,rhh_ts.v[i] * 0.01) * 3600)  # the PT calculates [mm/s]
-    print(ET_pt_sim_h[i])
+    # print(ET_pt_sim_h[i])
 
 # Let's plot the data we received from HbvSnow
 # #
@@ -414,18 +414,18 @@ for i in range(nhour-1):
 # # plt.axis([0,365,0,10])
 # plt.gcf().autofmt_xdate()
 # plt.grid(True)
-# #
-# fig, ax1 = plt.subplots(figsize=(7,5))
-# # ax2 = ax1.twinx()
-# ax1.plot(timeofday, LW_sim_h, 'ro-', label='LW_sim')
-# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-# ax1.plot(timeofday, LW_orig_h, 'g.-', label='Lw_orig')
-# ax1.set_ylabel('LW_sim vs LW_orig [MJ/m2/h]')
-# ax1.set_xlabel('DOY')
-# plt.title("Greeley, Colorado, hourly time-step")
-# plt.legend(loc="upper left")
-# # plt.axis([0,365,0,10])
-# plt.grid(True)
+#
+fig, ax1 = plt.subplots(figsize=(7,5))
+# ax2 = ax1.twinx()
+ax1.plot(timeofday, LW_sim_h, 'ro-', label='LW_sim')
+# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+ax1.plot(timeofday, LW_orig_h, 'g.-', label='Lw_orig')
+ax1.set_ylabel('LW_sim vs LW_orig [MJ/m2/h]')
+ax1.set_xlabel('DOY')
+plt.title("Greeley, Colorado, hourly time-step")
+plt.legend(loc="upper left")
+# plt.axis([0,365,0,10])
+plt.grid(True)
 
 
 
@@ -452,8 +452,8 @@ for i in range(nhour-1):
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
 # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-ax1.plot(timeofday, ET_rs_h, 'b.-', label='ET_rs-verification-set,'+crop+'-crop') #tall
-# ax1.plot(timeofday, ET_os_h, 'b.-', label='ET_os-verification-set,'+crop+' crop') #short
+# ax1.plot(timeofday, ET_rs_h, 'b.-', label='ET_rs-verification-set,'+crop+'-crop') #tall
+ax1.plot(timeofday, ET_os_h, 'b.-', label='ET_os-verification-set,'+crop+' crop') #short
 ax1.plot(timeofday, ET_ref_sim_h, 'ro-', label='ET_sim_pm')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
 
