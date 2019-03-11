@@ -15,23 +15,67 @@ temperature = 20.0 # [degC], real data should be used
 rhumidity = 50.0 #[%], real data should be used
 gsc = 1367
 
-# ymax = 450
-# yname = 'Rso, [W/m^2]'
-# xname = 'DOY'
-# plotname = "Eugene, OR, surface slope: "+str(slope_deg)+orient+ "Temperature dependency"
-# labels = ('Ra','Rso')
-# colors = ('r--','r', 'b--','b','g--','g','k--','k')
-# labloc = ("upper left","lower center", "upper center")
-#
-# fig1, ax1 = plt.subplots(figsize=(7, 5))
-#
-# temperature_array = [-40.0, -30.0, -10.0, 0.0, 10.0, 20.0, 30.0, 40.0]
-# i=0
-# for temperature in temperature_array:
-#     result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity, '1-hour')
-#     plot_results.plot_results(result[0], result[2], fig1, ax1, ymax, xname, yname, plotname, str(temperature), colors[i],labloc[1])
-#     i+=1
-# plt.show()
+
+
+ymax = 450
+yname = 'Rso, [W/m^2]'
+xname = 'DOY'
+plotname = "Eugene, OR, surface slope: "+str(slope_deg)+orient+ "Temperature dependency"
+labels = ('Ra','Rso')
+colors = ('r--','r', 'b--','b','g--','g','k--','k')
+labloc = ("upper left","lower center", "upper center")
+
+fig1, ax1 = plt.subplots(figsize=(7, 5))
+
+temperature_array = [-40.0, -30.0, -10.0, 0.0, 10.0, 20.0, 30.0, 40.0]
+i=0
+for temperature in temperature_array:
+    result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity, '1-hour')
+    plot_results.plot_results(result[0], result[2], fig1, ax1, ymax, xname, yname, plotname, str(temperature), colors[i],labloc[1])
+    i+=1
+plt.show()
+
+ymax = 120
+ymin = -10
+yname = 'NetLW, [W/m^2]'
+xname = 'DOY'
+i=0
+fig2, ax2 = plt.subplots(figsize=(7, 5))
+for temperature in temperature_array:
+    result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity,'3-hour','asce-ewri')
+    print(result[4])
+    plot_results.plot_results(result[0], result[4], fig2, ax2, ymax, xname, yname, plotname, str(temperature), colors[i],labloc[1],ymin) # 1h
+    print(result[4])
+    i+=1
+plt.show()
+ymax = 120
+ymin = -10
+yname = 'NetLW, [W/m^2]'
+xname = 'DOY'
+i=0
+fig2, ax2 = plt.subplots(figsize=(7, 5))
+for temperature in temperature_array:
+    result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity,'instant','asce-ewri')
+    print(result[4])
+    plot_results.plot_results(result[0], result[4], fig2, ax2, ymax, xname, yname, plotname, str(temperature), colors[i],labloc[1],ymin) # 1h
+    print(result[4])
+    i+=1
+plt.show()
+# #
+ymax = 120
+ymin = -10
+yname = 'NetLW, [W/m^2]'
+xname = 'DOY'
+i=0
+fig2, ax2 = plt.subplots(figsize=(7, 5))
+for temperature in temperature_array:
+    result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity,'24-hour','asce-ewri')
+    print(result[4])
+    plot_results.plot_results(result[0], result[4], fig2, ax2, ymax, xname, yname, plotname, str(temperature), colors[i],labloc[1],ymin) # 1h
+    print(result[4])
+    i+=1
+plt.show()
+# #
 # #
 # slope_array = [0.0, 30.0, 45.0, 60.0, 75.0, 90.0]
 # ymax = 400
@@ -145,34 +189,8 @@ for albedo in albedo_array:
     plot_results.plot_results(result[0], result[2], fig1, ax1, ymax, xname, yname, plotname, str(albedo), colors[i],labloc[3],ymin) # 1h
     i+=1
 plt.show()
-ymax = 30
-ymin = -20
-yname = 'NetLW, [W/m^2]'
-xname = 'DOY'
-i=0
-fig2, ax2 = plt.subplots(figsize=(7, 5))
-for albedo in albedo_array:
-    result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity,'24-hour','dingman')
-    plot_results.plot_results(result[0], result[4], fig2, ax2, ymax, xname, yname, plotname, str(albedo), colors[i],labloc[3],ymin) # 1h
-    print(result[4])
-    result1 = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature,
-                                         rhumidity, '1-hour', 'dingman')
-    plot_results.plot_results(result1[0], result1[4], fig2, ax2, ymax, xname, yname, plotname, str(albedo), colors[i],
-                              labloc[3], ymin)  # 1h
-    i+=1
-plt.show()
-i=0
-ymax = 30
-ymin = -50
-fig3, ax3 = plt.subplots(figsize=(7, 5))
-for albedo in albedo_array:
-    result = run_radiation.run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature,
-                                         rhumidity, '1-hour', 'dingman')
-    plot_results.plot_results(result[0], result[4], fig3, ax3, ymax, xname, yname, plotname, str(albedo), colors[i],
-                              labloc[3], ymin)  # 1h
-    print(result[4])
-    i+=1
-plt.show()
+
+
 #
 # turbidity_array = [0.01, 0.05, 0.1, 0.25, 0.5, 1.0]
 # slope_deg = 0.0

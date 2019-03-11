@@ -1,6 +1,6 @@
 def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbidity, temperature, rhumidity, flag = 'instant', method='dingman'):
 
-    """Module creates shyft radiation model with different timesteps and run it for a defined period of time. """
+    """Module creates shyft radiation model with different timesteps and run it for a defined period of time (1 year with 24-hours averaging) """
 
     import numpy as np
     import math
@@ -47,6 +47,7 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
         doy.append(dayi)
         k += 1
         dayi += 1
+
     if flag=='24-hour':
         dayi = 0
         doy = api.DoubleVector()
@@ -99,7 +100,7 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
         rv_rso = [sum(rso_3h[i:i + 8]) for i in range(0, len(rso_3h), 8)]
         rv_ra = [sum(ra_3h[i:i + 8]) for i in range(0, len(ra_3h), 8)]
         rv_net_sw = [sum(net_sw_3h[i:i + 8]) for i in range(0, len(net_sw_3h), 8)]
-        rv_net_lw = [sum(net_lw_3h[i:i + 8]) for i in range(0, len(net_lw_3h), 8)]
+        rv_net_lw = [sum(net_lw_3h[i:i + 8])/8 for i in range(0, len(net_lw_3h), 8)]
         rv_net = [sum(net_3h[i:i + 8]) for i in range(0, len(net_3h), 8)]
     elif flag=='1-hour':
         # runing 1h timestep
@@ -127,7 +128,7 @@ def run_radiation(latitude_deg, slope_deg, aspect_deg, elevation, albedo, turbid
         rv_rso = [sum(rso_1h[i:i + 24]) for i in range(0, len(rso_1h), 24)]
         rv_ra = [sum(ra_1h[i:i + 24]) for i in range(0, len(ra_1h), 24)]
         rv_net_sw = [sum(net_sw_1h[i:i + 24]) for i in range(0, len(net_sw_1h), 24)]
-        rv_net_lw = [sum(net_lw_1h[i:i + 24]) for i in range(0, len(net_lw_1h), 24)]
+        rv_net_lw = [sum(net_lw_1h[i:i + 24])/24 for i in range(0, len(net_lw_1h), 24)]
         rv_net = [sum(net_1h[i:i + 24]) for i in range(0, len(net_1h), 24)]
     elif flag=='instant':
         # running instantaneous with dmin timstep

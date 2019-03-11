@@ -64,6 +64,7 @@ height_ws = 3 # height of anemometer
 height_t = 1.68 # height of air temperature and rhumidity measurements
 surface_type = "irrigated grass"
 height_veg = 0.12 #vegetation height
+height_veg = 0.5 #vegetation height
 atm_pres_mean = 85.17 #[kPa]
 psychrom_const = 0.0566
 windspeed_adj = 0.921
@@ -71,6 +72,7 @@ lat_rad = latitude*math.pi/180
 slope_deg = 0.0
 aspect_deg = 0.0
 lai = 2.0
+rl = 144.0
 
 
 print(" --------------------------------------------------------- ")
@@ -160,7 +162,7 @@ radp = api.RadiationParameter(0.2,1.0)
 radc = api.RadiationCalculator(radp)
 radr =api.RadiationResponse()
 # pmp=api.PenmanMonteithParameter(lai,height_ws,height_t)
-rl = 144.0
+
 pmp=api.PenmanMonteithParameter(lai,height_ws,height_t,height_veg,rl)
 pmc=api.PenmanMonteithCalculator(pmp)
 pmr =api.PenmanMonteithResponse()
@@ -170,50 +172,76 @@ c_MJm2h2Wm2 = 0.0036
 
 ET_os_daily = [5.71, 6.71, 5.98, 6.86, 7.03, 7.50, 7.03, 6.16, 6.20, 6.61]
 ET_rs_daily = [7.34, 8.68, 7.65, 8.73, 9.07, 9.60, 9.56, 7.99, 7.68, 8.28]
+rs_d_ref = [32.43, 32.39, 32.36, 32.32, 32.27, 32.23, 32.18, 32.13, 32.08, 32.02]
+lw_d_ref = [3.96, 5.45, 4.15, 6.14, 5.15, 5.67, 4.71, 4.02, 5.16, 5.15]
+rnet_d_ref = [13.31, 15.20, 13.78, 16.19, 16.33, 16.83, 13.15, 13.00, 15.27, 16.15]
 doy = []
 # print("======================")
 # print("time ||  RNet || ET_ref |||| ET_os || ET_rs")
 day1 = 183
 ET_ref_sim_d = []
+rso_sim_d = []
+lw_sim_d  = []
 for i in range(n):
     print("======================")
     print("time: ", tadays.time(i))
     # print(dtdays)
     print("Tmean: ", tempmean_ts.v[i])
     print("RHmean: ", rhmean_ts.v[i])
-    radc.net_radiation_step_asce_st(radr, latitude, tadays.time(i), t_end,slope_deg, aspect_deg, tempmean_ts.v[i], rhmean_ts.v[i], elevation, rs_ts.v[i]/c_MJm2d2Wm2)
+    radc.net_radiation_step_asce_st(radr, latitude, tadays.time(i), api.deltahours(24),slope_deg, aspect_deg, tempmean_ts.v[i], rhmean_ts.v[i], elevation, rs_ts.v[i]/c_MJm2d2Wm2)
     print("Ra: ", radr.ra*c_MJm2d2Wm2 )
-    print("Rso: ", radr.net_sw*c_MJm2d2Wm2 )
-    print("LW: ", radr.net_lw*c_MJm2d2Wm2 )
+    print("Rso: ", radr.sw_cs_p*c_MJm2d2Wm2 )
+    rso_sim_d.append(radr.sw_cs_p*c_MJm2d2Wm2)
+    print("Net SW: ", radr.net_sw * c_MJm2d2Wm2)
+    print("LW: ", radr.net_lw*c_MJm2d2Wm2)
+    lw_sim_d.append(radr.net_lw*c_MJm2d2Wm2)
     print("RNet: ", radr.net*c_MJm2d2Wm2 )
-    pmc.reference_evapotranspiration_asce_full(pmr,radr.net*c_MJm2d2Wm2 ,tempmean_ts.v[i],rhmean_ts.v[i],elevation,windspeed_ts.v[i])
+    pmc.reference_evapotranspiration_asce_st(pmr, radr.sw_t, tempmean_ts.v[i], rhmean_ts.v[i], elevation,
+                                               windspeed_ts.v[i])
+    # pmc.reference_evapotranspiration_asce_full(pmr,radr.net*c_MJm2d2Wm2 ,tempmean_ts.v[i],rhmean_ts.v[i],elevation,windspeed_ts.v[i])
     print("======================")
     print("ET_ref: ", pmr.et_ref)
-    ET_ref_sim_d.append(pmr.et_ref)
+    ET_ref_sim_d.append(pmr.et_ref* c_MJm2d2Wm2)
     doy.append(day1+1)
     day1+=1
     # print(tadays.time(i)," || ", radr.net_radiation*c_MJm2d2Wm2," || ", pmr.et_ref," || ", ET_os_daily[i]," || ", ET_rs_daily[i], " || ")
     print("======================")
 
+# Let's plot the data we received from HbvSnow
+fig, ax1 = plt.subplots(figsize=(7,5))
+# ax2 = ax1.twinx()
+# ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
+ax1.plot(doy, rso_sim_d, 'ro-', label='rso_sim')
+# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+ax1.plot(doy, rs_d_ref, 'g.-', label='rso_ref')
+ax1.plot(doy, ws_Rs, 'g.-', label='ws_rs')
 
 # Let's plot the data we received from HbvSnow
-# fig, ax1 = plt.subplots(figsize=(7,5))
-# # ax2 = ax1.twinx()
-# # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-# ax1.plot(doy, ET_ref_sim_d, 'ro-', label='ET_sim')
-# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-# ax1.plot(doy, ET_os_daily, 'g.-', label='ET_os')
-# ax1.plot(doy, ET_rs_daily, 'b.-', label='ET_rs')
-#
-#
-# ax1.set_ylabel('ET_sim, ET_os, ET_rs [mm/day]')
-# # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
-# ax1.set_xlabel('DOY')
-# plt.title("Greeley, Colorado, daily time-step")
-# plt.legend(loc="upper left")
-# # plt.axis([0,365,0,10])
-# plt.grid(True)
-# plt.show()
+fig, ax1 = plt.subplots(figsize=(7,5))
+# ax2 = ax1.twinx()
+# ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
+ax1.plot(doy, lw_sim_d, 'ro-', label='lw_sim')
+# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+ax1.plot(doy, lw_d_ref, 'g.-', label='lw_ref')
+
+# Let's plot the data we received from HbvSnow
+fig, ax1 = plt.subplots(figsize=(7,5))
+# ax2 = ax1.twinx()
+# ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
+ax1.plot(doy, ET_ref_sim_d, 'ro-', label='ET_sim')
+# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+ax1.plot(doy, ET_os_daily, 'g.-', label='ET_os')
+ax1.plot(doy, ET_rs_daily, 'b.-', label='ET_rs')
+
+
+ax1.set_ylabel('ET_sim, ET_os, ET_rs [mm/day]')
+# ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
+ax1.set_xlabel('DOY')
+plt.title("Greeley, Colorado, daily time-step")
+plt.legend(loc="upper left")
+# plt.axis([0,365,0,10])
+plt.grid(True)
+plt.show()
 
 
 # Single method test based on ASCE-EWRI Appendix C, hourly time-step
@@ -340,14 +368,14 @@ for i in range(nhour-1):
     # print(datetime.fromtimestamp(tah.time(i)))
     # print("Th: ", temph_ts.v[i])
     # print("RHh: ", rhh_ts.v[i])
-    # radch.net_radiation_step_asce_st(radrh, latitude, tah.time(i), api.deltahours(1),slope_deg, aspect_deg, temph_ts.v[i], rhh_ts.v[i], elevation, rsh_ts.v[i]/c_MJm2h2Wm2 )
-    radch.net_radiation_step(radrh, latitude, tah.time(i), api.deltahours(1), slope_deg, aspect_deg, temph_ts.v[i],rhh_ts.v[i], elevation, rsh_ts.v[i] / c_MJm2h2Wm2)
+    radch.net_radiation_step_asce_st(radrh, latitude, tah.time(i), api.deltahours(1),slope_deg, aspect_deg, temph_ts.v[i], rhh_ts.v[i], elevation, rsh_ts.v[i]/c_MJm2h2Wm2 )
+    # radch.net_radiation_step(radrh, latitude, tah.time(i), api.deltahours(1), slope_deg, aspect_deg, temph_ts.v[i],rhh_ts.v[i], elevation, rsh_ts.v[i] / c_MJm2h2Wm2)
     # print("Ra: ", radrh.ra*c_MJm2h2Wm2)
     Ra_sim_h.append(radrh.ra*c_MJm2h2Wm2*24 )
     # print("Rs input:", rsh_ts.v[i]/c_MJm2h2Wm2)
     # print("Rso: ", radrh.sw_t)
     Rso_sim_h.append(radrh.sw_t * c_MJm2h2Wm2)
-    SW_sim_h.append(radrh.net_sw*c_MJm2h2Wm2)
+    SW_sim_h.append(radrh.sw_t*c_MJm2h2Wm2)
     print("LW: ", radrh.net_lw*c_MJm2h2Wm2)
     LW_sim_h.append(radrh.net_lw*c_MJm2h2Wm2)
     # print("RNet: ", radrh.net*c_MJm2h2Wm2 )
@@ -370,50 +398,50 @@ for i in range(nhour-1):
 
 # Let's plot the data we received from HbvSnow
 # #
-# fig, ax1 = plt.subplots(figsize=(7,5))
-# ax1.plot(timeofday, ws_Rsh[0:29], 'ro-', label='WS Rsh')
-# # ax1.plot(timeofday, Rnet_orig_h, 'g.-', label='Rnet_orig')
-# ax1.set_ylabel('Measured Solar Radiation [MJ/m2/h]')
-# ax1.set_xlabel('Time of Day')
-# plt.title("Greeley, Colorado, hourly time-step")
-# plt.legend(loc="upper left")
-# # plt.axis([0,365,0,10])
-# plt.gcf().autofmt_xdate()
-# plt.grid(True)
-# fig, ax1 = plt.subplots(figsize=(7,5))
-# ax1.plot(timeofday, Rnet_sim_h, 'ro-', label='Rnet_sim')
+fig, ax1 = plt.subplots(figsize=(7,5))
+ax1.plot(timeofday, ws_Rsh[0:29], 'ro-', label='WS Rsh')
 # ax1.plot(timeofday, Rnet_orig_h, 'g.-', label='Rnet_orig')
-# ax1.set_ylabel('Rnet_sim vs Rnet_orig [MJ/m2/h]')
-# ax1.set_xlabel('Time of Day')
-# plt.title("Greeley, Colorado, hourly time-step")
-# plt.legend(loc="upper left")
-# # plt.axis([0,365,0,10])
-# plt.gcf().autofmt_xdate()
-# plt.grid(True)
+ax1.set_ylabel('Measured Solar Radiation [MJ/m2/h]')
+ax1.set_xlabel('Time of Day')
+plt.title("Greeley, Colorado, hourly time-step")
+plt.legend(loc="upper left")
+# plt.axis([0,365,0,10])
+plt.gcf().autofmt_xdate()
+plt.grid(True)
+fig, ax1 = plt.subplots(figsize=(7,5))
+ax1.plot(timeofday, Rnet_sim_h, 'ro-', label='Rnet_sim')
+ax1.plot(timeofday, Rnet_orig_h, 'g.-', label='Rnet_orig')
+ax1.set_ylabel('Rnet_sim vs Rnet_orig [MJ/m2/h]')
+ax1.set_xlabel('Time of Day')
+plt.title("Greeley, Colorado, hourly time-step")
+plt.legend(loc="upper left")
+# plt.axis([0,365,0,10])
+plt.gcf().autofmt_xdate()
+plt.grid(True)
 # # #
-# fig, ax1 = plt.subplots(figsize=(7,5))
-# ax1.plot(timeofday, Ra_sim_h, 'ro-', label='Ra_sim')
-# ax1.plot(timeofday, Ra_orig_h, 'g.-', label='Ra_orig')
-# ax1.set_ylabel('Ra_sim vs Ra_orig [MJ/m2/h]')
-# ax1.set_xlabel('DOY')
-# plt.title("Greeley, Colorado, hourly time-step")
-# plt.legend(loc="upper left")
-# # plt.axis([0,365,0,10])
-# plt.gcf().autofmt_xdate()
-# plt.grid(True)
-# # #
-# fig, ax1 = plt.subplots(figsize=(7,5))
-# # ax2 = ax1.twinx()
-# ax1.plot(timeofday, SW_sim_h, 'ro-', label='SW_sim')
-# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-# ax1.plot(timeofday, SW_orig_h, 'g.-', label='Sw_orig')
-# ax1.set_ylabel('SW_sim vs SW_orig [MJ/m2/h]')
-# ax1.set_xlabel('DOY')
-# plt.title("Greeley, Colorado, hourly time-step")
-# plt.legend(loc="upper left")
-# # plt.axis([0,365,0,10])
-# plt.gcf().autofmt_xdate()
-# plt.grid(True)
+fig, ax1 = plt.subplots(figsize=(7,5))
+ax1.plot(timeofday, Ra_sim_h, 'ro-', label='Ra_sim')
+ax1.plot(timeofday, Ra_orig_h, 'g.-', label='Ra_orig')
+ax1.set_ylabel('Ra_sim vs Ra_orig [MJ/m2/h]')
+ax1.set_xlabel('DOY')
+plt.title("Greeley, Colorado, hourly time-step")
+plt.legend(loc="upper left")
+# plt.axis([0,365,0,10])
+plt.gcf().autofmt_xdate()
+plt.grid(True)
+# #
+fig, ax1 = plt.subplots(figsize=(7,5))
+# ax2 = ax1.twinx()
+ax1.plot(timeofday, SW_sim_h, 'ro-', label='SW_sim')
+# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+ax1.plot(timeofday, SW_orig_h, 'g.-', label='Sw_orig')
+ax1.set_ylabel('SW_sim vs SW_orig [MJ/m2/h]')
+ax1.set_xlabel('DOY')
+plt.title("Greeley, Colorado, hourly time-step")
+plt.legend(loc="upper left")
+# plt.axis([0,365,0,10])
+plt.gcf().autofmt_xdate()
+plt.grid(True)
 #
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
