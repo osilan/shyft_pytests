@@ -3,18 +3,35 @@ import plot_results
 from matplotlib import pyplot as plt
 import math
 
-latitude_deg = 44.0
-slope_deg = 90.0
-aspect_deg = 0.0
-orient = " South. "
-if aspect_deg>=180:
-    orient = " North. "
-albedo = 0.05
-turbidity = 1.0
-elevation = 150.0
-temperature = 20.0 # [degC], real data should be used
-rhumidity = 50.0 #[%], real data should be used
-gsc = 1367
+# Single method test based on ASCE-EWRI Appendix C, hourly time-step
+latitude = 40.41
+longitude = 104.78
+elevation = 1462.4
+height_ws = 3 # height of anemometer
+height_t = 1.68 # height of air temperature and rhumidity measurements
+surface_type = "irrigated grass"
+height_veg = 0.12 #vegetation height
+# height_veg = 0.5 #tall
+atm_pres_mean = 85.17  # [kPa]
+psychrom_const = 0.0566
+windspeed_adj = 0.921
+# lat_rad = latitude*math.pi/180
+# slope_deg = 0.0
+# aspect_deg = 0.0
+# lai = 2.0
+# rl = 144
+
+print(" --------------------------------------------------------- ")
+print(" --- Single method  test, hourly --- ")
+print(" --- Station: Greeley, Colorado --- ")
+print(" --- Latitude: ",latitude," --- ")
+print(" --- Longitude: ",longitude," --- ")
+print(" --- Elevation: ",elevation," --- ")
+print(" --- Anemometer height: ",height_ws," --- ")
+print(" --- Height of air temperature measurements: ",height_t," --- ")
+print(" --- Type of surface: ",surface_type," --- ")
+print(" --- Vegetation height: ",height_veg," --- ")
+print(" --------------------------------------------------------- ")
 
 # Data from weather station
 ws_Th = [30.9, 31.2, 29.1, 28.3, 26.0, 22.9, 20.1, 19.9, 18.4, 16.5, 15.4, 15.5, 13.5, 13.2, 16.2, 20.0, 22.9, 26.4,
@@ -35,37 +52,39 @@ def rhh_fun(Th, eah):
 
 ws_rhh = rhh_fun(ws_Th, ws_eah)
 
+Rnet_orig_h = [1.441, 1.009, 0.244, 0.229, 0.044, -0.016, -0.015, -0.015, -0.015, -0.014, -0.014, -0.014, -0.014, 0.009,
+               0.340, 0.616, 1.096, 1.524, 1.888, 2.171, 2.164, 2.239, 1.964, 1.485, 0.905, 0.593, 0.461, 0.065, -0.12]
 
-# Temperature impact
-ws_Th_p20 = []
-ws_Th_m20 = []
-ws_Th_p50 = []
-ws_Th_m50 = []
-for t in ws_Th:
-    ws_Th_p20.append(t + t * 0.2)
-    ws_Th_m20.append(t - t * 0.2)
-    ws_Th_p50.append(t + t * 0.5)
-    ws_Th_m50.append(t - t * 0.5)
+# # Temperature impact
+# ws_Th_p20 = []
+# ws_Th_m20 = []
+# ws_Th_p50 = []
+# ws_Th_m50 = []
+# for t in ws_Th:
+#     ws_Th_p20.append(t + t * 0.2)
+#     ws_Th_m20.append(t - t * 0.2)
+#     ws_Th_p50.append(t + t * 0.5)
+#     ws_Th_m50.append(t - t * 0.5)
+#
+# result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h)
+# plt.plot(result,'g',label='Initial ws_Th')
+# result2 = run_pm.run_pm(ws_Th_m20, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh,Rnet_orig_h)
+# plt.plot(result2,'m--',label='-20%')
+# result4 = run_pm.run_pm(ws_Th_m50, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h)
+# plt.plot(result4,'b--',label='-50%')
+# result1 = run_pm.run_pm(ws_Th_p20, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h)
+# plt.plot(result1,'y-.',label='+20%')
+# result3 = run_pm.run_pm(ws_Th_p50, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h)
+# plt.plot(result3,'r-.',label='+50%')
+#
+# plt.legend(loc="upper left")
+#
+# plt.title("Greeley, Colorado, 1-hour time-step, Temperature dependency")
+# plt.grid(True)
+# plt.show()
 
-result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh)
-plt.plot(result,'g',label='Initial ws_Th')
-result2 = run_pm.run_pm(ws_Th_m20, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh)
-plt.plot(result2,'m--',label='-20%')
-result4 = run_pm.run_pm(ws_Th_m50, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh)
-plt.plot(result4,'b--',label='-50%')
-result1 = run_pm.run_pm(ws_Th_p20, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh)
-plt.plot(result1,'y-.',label='+20%')
-result3 = run_pm.run_pm(ws_Th_p50, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh)
-plt.plot(result3,'r-.',label='+50%')
-
-plt.legend(loc="upper left")
-
-
-plt.grid(True)
-plt.show()
-
-
-# windspeed impact
+#
+# #windspeed impact
 # ws_wsh_p20 = []
 # ws_wsh_m20 = []
 # ws_wsh_p50 = []
@@ -76,20 +95,189 @@ plt.show()
 #     ws_wsh_p50.append(ws + ws * 0.5)
 #     ws_wsh_m50.append(ws - ws * 0.5)
 #
-# result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh)
+# result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h)
 # plt.plot(result,'g',label='Initial ws_wsh')
-# result2 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_wsh_m20,ws_rhh)
+# result2 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_wsh_m20,ws_rhh, Rnet_orig_h)
 # plt.plot(result2,'m--',label='-20%')
-# result4 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_wsh_m50,ws_rhh)
+# result4 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_wsh_m50,ws_rhh, Rnet_orig_h)
 # plt.plot(result4,'b--',label='-50%')
-# result1 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_wsh_p20,ws_rhh)
+# result1 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_wsh_p20,ws_rhh, Rnet_orig_h)
 # plt.plot(result1,'y-.',label='+20%')
-# result3 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_wsh_p50,ws_rhh)
+# result3 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_wsh_p50,ws_rhh, Rnet_orig_h)
 # plt.plot(result3,'r-.',label='+50%')
 #
 # plt.legend(loc="upper left")
 #
+# plt.title("Greeley, Colorado, 1-hour time-step, Windspeed dependency")
+# plt.grid(True)
+# plt.show()
+# #
+
+# # actual vapour pressure impact
+# ws_eah_p20 = []
+# ws_eah_m20 = []
+# ws_eah_p50 = []
+# ws_eah_m50 = []
+# for ea in ws_eah:
+#     ws_eah_p20.append(ea + ea * 0.2)
+#     ws_eah_m20.append(ea - ea * 0.2)
+#     ws_eah_p50.append(ea + ea * 0.5)
+#     ws_eah_m50.append(ea - ea * 0.5)
 #
+# ws_rhh = rhh_fun(ws_Th, ws_eah)
+# ws_rhh_p20 = rhh_fun(ws_Th, ws_eah_p20)
+# ws_rhh_m20 = rhh_fun(ws_Th, ws_eah_m20)
+# ws_rhh_p50 = rhh_fun(ws_Th, ws_eah_p50)
+# ws_rhh_m50 = rhh_fun(ws_Th, ws_eah_m50)
+#
+# result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh, Rnet_orig_h)
+# plt.plot(result,'g',label='Initial ws_eah')
+# result2 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah_m20,ws_rhh, Rnet_orig_h)
+# plt.plot(result2,'m--',label='-20%')
+# result4 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah_m50,ws_rhh, Rnet_orig_h)
+# plt.plot(result4,'b--',label='-50%')
+# result1 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah_p20,ws_rhh, Rnet_orig_h)
+# plt.plot(result1,'y-.',label='+20%')
+# result3 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah_p50,ws_rhh, Rnet_orig_h)
+# plt.plot(result3,'r-.',label='+50%')
+#
+# plt.legend(loc="upper left")
+#
+# plt.title("Greeley, Colorado, 1-hour time-step, Actual vapour pressure dependency")
 # plt.grid(True)
 # plt.show()
 
+# # relative humidity impact
+# ws_rhh_p20 = []
+# ws_rhh_m20 = []
+# ws_rhh_p50 = []
+# ws_rhh_m50 = []
+# for rh in ws_rhh:
+#     ws_rhh_p20.append(rh + rh * 0.2)
+#     ws_rhh_m20.append(rh - rh * 0.2)
+#     ws_rhh_p50.append(rh + rh * 0.5)
+#     ws_rhh_m50.append(rh - rh * 0.5)
+#
+# result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh, Rnet_orig_h)
+# plt.plot(result,'g',label='Initial ws_rhh')
+# result2 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh_m20, Rnet_orig_h)
+# plt.plot(result2,'m--',label='-20%')
+# result4 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh_m50, Rnet_orig_h)
+# plt.plot(result4,'b--',label='-50%')
+# result1 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh_p20, Rnet_orig_h)
+# plt.plot(result1,'y-.',label='+20%')
+# result3 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh_p50, Rnet_orig_h)
+# plt.plot(result3,'r-.',label='+50%')
+#
+# plt.legend(loc="upper left")
+#
+# plt.title("Greeley, Colorado, 1-hour time-step, Relative humidity dependency")
+# plt.grid(True)
+# plt.show()
+
+# # rnet impact
+# rneth_p20 = []
+# rneth_m20 = []
+# rneth_p50 = []
+# rneth_m50 = []
+# for rnet in Rnet_orig_h:
+#     rneth_p20.append(rnet + rnet * 0.2)
+#     rneth_m20.append(rnet - rnet * 0.2)
+#     rneth_p50.append(rnet + rnet * 0.5)
+#     rneth_m50.append(rnet - rnet * 0.5)
+#
+# result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh, Rnet_orig_h)
+# plt.plot(result,'g',label='Initial rneth')
+# result2 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh, rneth_m20)
+# plt.plot(result2,'m--',label='-20%')
+# result4 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh, rneth_m50)
+# plt.plot(result4,'b--',label='-50%')
+# result1 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh, rneth_p20)
+# plt.plot(result1,'y-.',label='+20%')
+# result3 = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_eah,ws_rhh, rneth_p50)
+# plt.plot(result3,'r-.',label='+50%')
+#
+# plt.legend(loc="upper left")
+#
+# plt.title("Greeley, Colorado, 1-hour time-step, Rnet dependency")
+# plt.grid(True)
+# plt.show()
+#
+# # height vegetation
+#
+# dt = 1
+# n = 30
+# lai = 2.0
+# rl = 144
+# hveg_array = [0.01, 0.05, 0.1, 0.12, 0.25, 0.5, 1.0, 1.5]
+# colors = ('r--','r', 'b--','b','g--','g','k--','k')
+# i = 0
+# for height_veg in hveg_array:
+#     result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,lai,rl,height_ws, height_t, elevation)
+#     plt.plot(result,colors[i],label=height_veg)
+#     i+=1
+#
+# plt.legend(loc="upper center")
+#
+# plt.title("Greeley, Colorado, 1-hour time-step, Height_veg dependency")
+# plt.grid(True)
+# plt.show()
+
+
+# # elevation
+#
+# dt = 1
+# n = 30
+# lai = 2.0
+# rl = 144
+# elevation_array = [-100, 0.0, 100, 500, 1000, 1500, 3000, 8000]
+# colors = ('r--','r', 'b--','b','g--','g','k--','k')
+# i = 0
+# for elevation in elevation_array:
+#     result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,lai,rl,height_ws, height_t, elevation)
+#     plt.plot(result,colors[i],label=elevation)
+#     i+=1
+#
+# plt.legend(loc="upper center")
+#
+# plt.title("Greeley, Colorado, 1-hour time-step, Elevation dependency")
+# plt.grid(True)
+# plt.show()
+
+# # ws measurements height
+# dt = 1
+# n = 30
+# lai = 2.0
+# rl = 144
+# height_ws_array = [0.01, 0.1, 0.2, 0.5, 1.0, 1.68, 2.0, 3.0, 5.0]
+# colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
+# i = 0
+# for height_ws in height_ws_array:
+#     result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,lai,rl,height_ws, height_t, elevation)
+#     plt.plot(result,colors[i],label=height_ws)
+#     i+=1
+#
+# plt.legend(loc="upper center")
+#
+# plt.title("Greeley, Colorado, 1-hour time-step, Height windspeed measurements dependency")
+# plt.grid(True)
+# plt.show()
+
+# t measurements height
+dt = 1
+n = 30
+lai = 2.0
+rl = 144
+height_t_array = [0.01, 0.1, 0.2, 0.5, 1.0, 1.68, 2.0, 3.0, 5.0]
+colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
+i = 0
+for height_t in height_t_array:
+    result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,lai,rl,height_ws, height_t, elevation)
+    plt.plot(result,colors[i],label=height_t)
+    i+=1
+
+plt.legend(loc="upper center")
+
+plt.title("Greeley, Colorado, 1-hour time-step, Height temperature/rhumidity measurements dependency")
+plt.grid(True)
+plt.show()
