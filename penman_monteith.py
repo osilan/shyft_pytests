@@ -43,7 +43,7 @@ time = api.utctime_now()
 radcal.net_radiation(radresponse, 40.4, time, 0.0, 0.0, 20.0, 40.0, 150.0, 0.0);
 print(radresponse.net)
 
-pmparam=api.PenmanMonteithParameter(2.0,2.0,2.0, 0.12,144.0)
+pmparam=api.PenmanMonteithParameter(0.12,2.0,2.0, 144.0)
 pmcalculator=api.PenmanMonteithCalculator(pmparam)
 pmresponse =api.PenmanMonteithResponse()
 
@@ -64,14 +64,13 @@ height_ws = 3 # height of anemometer
 height_t = 1.68 # height of air temperature and rhumidity measurements
 surface_type = "irrigated grass"
 height_veg = 0.12 #vegetation height
-height_veg = 0.5 #vegetation height
+# height_veg = 0.5 #vegetation height
 atm_pres_mean = 85.17 #[kPa]
 psychrom_const = 0.0566
 windspeed_adj = 0.921
 lat_rad = latitude*math.pi/180
 slope_deg = 0.0
 aspect_deg = 0.0
-lai = 2.0
 rl = 144.0
 
 
@@ -163,7 +162,7 @@ radc = api.RadiationCalculator(radp)
 radr =api.RadiationResponse()
 # pmp=api.PenmanMonteithParameter(lai,height_ws,height_t)
 
-pmp=api.PenmanMonteithParameter(lai,height_ws,height_t,height_veg,rl)
+pmp=api.PenmanMonteithParameter(height_veg,height_ws,height_t,rl)
 pmc=api.PenmanMonteithCalculator(pmp)
 pmr =api.PenmanMonteithResponse()
 
@@ -189,6 +188,8 @@ for i in range(n):
     print("Tmean: ", tempmean_ts.v[i])
     print("RHmean: ", rhmean_ts.v[i])
     radc.net_radiation_step_asce_st(radr, latitude, tadays.time(i), api.deltahours(24),slope_deg, aspect_deg, tempmean_ts.v[i], rhmean_ts.v[i], elevation, rs_ts.v[i]/c_MJm2d2Wm2)
+    # radc.net_radiation_step_asce_st(radr, latitude, tadays.time(i), api.deltahours(24), slope_deg, aspect_deg,
+    #                                 tempmean_ts.v[i], rhmean_ts.v[i], elevation, 0.0)
     print("Ra: ", radr.ra*c_MJm2d2Wm2 )
     print("Rso: ", radr.sw_cs_p*c_MJm2d2Wm2 )
     rso_sim_d.append(radr.sw_cs_p*c_MJm2d2Wm2)
@@ -196,10 +197,10 @@ for i in range(n):
     print("LW: ", radr.net_lw*c_MJm2d2Wm2)
     lw_sim_d.append(radr.net_lw*c_MJm2d2Wm2)
     print("RNet: ", radr.net*c_MJm2d2Wm2 )
-    # pmc.reference_evapotranspiration_asce_st(pmr, api.deltahours(24),radr.net, tempmean_ts.v[i], rhmean_ts.v[i], elevation,
-    #                                            windspeed_ts.v[i])
-    pmc.reference_evapotranspiration_asce_st(pmr, api.deltahours(24),rnet_d_ref[i], tempmax_ts.v[i],  tempmin_ts.v[i],  rhmean_ts.v[i], elevation,
-                                             windspeed_ts.v[i])
+    pmc.reference_evapotranspiration_asce_st(pmr, api.deltahours(24),radr.net*c_MJm2d2Wm2, tempmin_ts.v[i],tempmax_ts.v[i], rhmean_ts.v[i], elevation,
+                                               windspeed_ts.v[i])
+    # pmc.reference_evapotranspiration_asce_st(pmr, api.deltahours(24),rnet_d_ref[i], tempmax_ts.v[i],  tempmin_ts.v[i],  rhmean_ts.v[i], elevation,
+    #                                          windspeed_ts.v[i])
     # pmc.reference_evapotranspiration_asce_full(pmr,radr.net,tempmean_ts.v[i],rhmean_ts.v[i],elevation,windspeed_ts.v[i])
     # pmc.reference_evapotranspiration_asce_full(pmr, rnet_d_ref[i]/c_MJm2d2Wm2, tempmean_ts.v[i], rhmean_ts.v[i], elevation,
     #                                            windspeed_ts.v[i])
@@ -213,33 +214,33 @@ for i in range(n):
     # print(tadays.time(i)," || ", radr.net_radiation*c_MJm2d2Wm2," || ", pmr.et_ref," || ", ET_os_daily[i]," || ", ET_rs_daily[i], " || ")
     print("======================")
 
-# Let's plot the data we received from HbvSnow
-fig, ax1 = plt.subplots(figsize=(7,5))
-# ax2 = ax1.twinx()
-# ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-ax1.plot(doy, rso_sim_d, 'ro-', label='rso_sim')
-# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-ax1.plot(doy, rs_d_ref, 'g.-', label='rso_ref')
-ax1.set_ylabel('Rso-radiation, [MJ/m2 day]')
-# ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
-ax1.set_xlabel('DOY')
-plt.title("Greeley, Colorado, daily time-step")
-plt.grid(True)
-# ax1.plot(doy, ws_Rs, 'g.-', label='ws_rs')
+# # Let's plot the data we received from HbvSnow
+# fig, ax1 = plt.subplots(figsize=(7,5))
+# # ax2 = ax1.twinx()
+# # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
+# ax1.plot(doy, rso_sim_d, 'ro-', label='rso_sim')
+# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+# ax1.plot(doy, rs_d_ref, 'g.-', label='rso_ref')
+# ax1.set_ylabel('Rso-radiation, [MJ/m2 day]')
+# # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
+# ax1.set_xlabel('DOY')
+# plt.title("Greeley, Colorado, daily time-step")
+# plt.grid(True)
+# # ax1.plot(doy, ws_Rs, 'g.-', label='ws_rs')
 
-# Let's plot the data we received from HbvSnow
-fig, ax1 = plt.subplots(figsize=(7,5))
-# ax2 = ax1.twinx()
-# ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-ax1.plot(doy, lw_sim_d, 'ro-', label='lw_sim')
-# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-ax1.plot(doy, lw_d_ref, 'g.-', label='lw_ref')
-ax1.set_ylabel('LW-radiation, [MJ/m2 day]')
-# ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
-ax1.set_xlabel('DOY')
-plt.title("Greeley, Colorado, daily time-step")
-plt.legend(loc="upper left")
-plt.grid(True)
+# # Let's plot the data we received from HbvSnow
+# fig, ax1 = plt.subplots(figsize=(7,5))
+# # ax2 = ax1.twinx()
+# # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
+# ax1.plot(doy, lw_sim_d, 'ro-', label='lw_sim')
+# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+# ax1.plot(doy, lw_d_ref, 'g.-', label='lw_ref')
+# ax1.set_ylabel('LW-radiation, [MJ/m2 day]')
+# # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
+# ax1.set_xlabel('DOY')
+# plt.title("Greeley, Colorado, daily time-step")
+# plt.legend(loc="upper left")
+# plt.grid(True)
 
 # Let's plot the data we received from HbvSnow
 fig, ax1 = plt.subplots(figsize=(7,5))
@@ -249,8 +250,6 @@ ax1.plot(doy, ET_ref_sim_d, 'ro-', label='ET_sim')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
 ax1.plot(doy, ET_os_daily, 'g.-', label='ET_os -- short crop')
 ax1.plot(doy, ET_rs_daily, 'b.-', label='ET_rs -- tall crop')
-# # ax1.plot(timeofday, ET_rs_h, 'b.-', label='ET_rs-verification-set,'+crop+'-crop') #tall
-# ax1.plot(timeofday, ET_os_h, 'b.-', label='ET_os-verification-set,'+crop+' crop') #short
 
 ax1.set_ylabel('ET_sim, ET_os, ET_rs [mm/day]')
 # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
@@ -262,29 +261,29 @@ plt.grid(True)
 plt.show()
 
 
-# Single method test based on ASCE-EWRI Appendix C, hourly time-step
-latitude = 40.41
-longitude = 104.78
-elevation = 1462.4
-height_ws = 3 # height of anemometer
-height_t = 1.68 # height of air temperature and rhumidity measurements
-surface_type = "irrigated grass"
-height_veg = 0.12 #vegetation height
+# # Single method test based on ASCE-EWRI Appendix C, hourly time-step
+# latitude = 40.41
+# longitude = 104.78
+# elevation = 1462.4
+# height_ws = 3 # height of anemometer
+# height_t = 1.68 # height of air temperature and rhumidity measurements
+# surface_type = "irrigated grass"
+# height_veg = 0.12 #vegetation height
 # height_veg = 0.5 #tall
-if height_veg>0.12:
-    crop="tall"
-else:
-    crop = "short"
-atm_pres_mean = 85.17 #[kPa]
-psychrom_const = 0.0566
-windspeed_adj = 0.921
-lat_rad = latitude*math.pi/180
-slope_deg = 0.0
-aspect_deg = 0.0
-lai = 8.0
-rl = 144.0
-
-
+# if height_veg>0.12:
+#     crop="tall"
+# else:
+#     crop = "short"
+# atm_pres_mean = 85.17 #[kPa]
+# psychrom_const = 0.0566
+# windspeed_adj = 0.921
+# lat_rad = latitude*math.pi/180
+# slope_deg = 0.0
+# aspect_deg = 0.0
+# lai = 8.0
+# rl = 144.0
+#
+#
 # print(" --------------------------------------------------------- ")
 # print(" --- Single method  test, hourly --- ")
 # print(" --- Station: Greeley, Colorado --- ")
@@ -359,7 +358,7 @@ rl = 144.0
 # radch = api.RadiationCalculator(radph)
 # radrh =api.RadiationResponse()
 # # pmph=api.PenmanMonteithParameter(lai,height_ws,height_t)
-# pmph=api.PenmanMonteithParameter(lai,height_ws,height_t,height_veg, rl)
+# pmph=api.PenmanMonteithParameter(height_veg,height_ws,height_t, rl)
 # pmch=api.PenmanMonteithCalculator(pmph)
 # pmrh =api.PenmanMonteithResponse()
 #

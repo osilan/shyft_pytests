@@ -71,7 +71,7 @@ def run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, rnet, height_veg=0.12,dt
     radch = api.RadiationCalculator(radph)
     radrh =api.RadiationResponse()
     # pmph=api.PenmanMonteithParameter(lai,height_ws,height_t)
-    pmph=api.PenmanMonteithParameter(lai,height_ws,height_t,height_veg, rl)
+    pmph=api.PenmanMonteithParameter(height_veg,height_ws,height_t, rl)
     pmch=api.PenmanMonteithCalculator(pmph)
     pmrh =api.PenmanMonteithResponse()
 
