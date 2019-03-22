@@ -281,40 +281,17 @@ while (i<n):
         # print("rhumidity: ",rhP1)
         rsm = sw_net_oct16[i*24+j]
         rsm_average += rsm
-        # print("measured Rs: ", rsm)
-        # print(time1)
-        # print(time2)
-        # if ((3*j)<24):
-        #     time0 = ta.time(i * 24 + j*3-3)
-        #     # time3 = ta.time(i * 24 + j * 3 )
-        #     if (j>7):
-        #         time3 = ta.time(i*24+j*3-1)
-        #     else:
-        #         time3 = ta.time(i*24+j*3)
-        #     # print(time0)
-        #     # print(time3)
-        #     radcaly3.net_radiation_step(radresy3, latitude, time0, time3, slope_deg, aspect_deg, tempP1, rhP1, elevation, rsm)
-        #     swrad3 += radresy3.sw_radiation
-        #     rarad3 += radresy3.ra
-        # print(time1)
-        # print(time)
-        # print("--------")
         radcaly.net_radiation(radresy, latitude, time1, slope_deg, aspect_deg,tempP1, rhP1, elevation,0.0)
-        radcaly1.net_radiation_step(radresy1, latitude, time1, time2, slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
+        radcaly1.net_radiation_step(radresy1, latitude, time1, api.deltahours(1), slope_deg, aspect_deg, tempP1, rhP1, elevation,rsm)
 
-        # omega = 15*(j-12)*math.pi/180
-        omega1 = radresy.sun_rise * math.pi / 180
-        omega2 = radresy.sun_set * math.pi / 180
-        # print(omega)
+           # print(omega)
         # print("omega1:", omega1)
-        netrad += radresy.sw_radiation
-        swrad1 += radresy1.sw_radiation
-        sw_simulated_1h.append(radresy.sw_radiation)
+        netrad += radresy.net
+        swrad1 += radresy1.sw_cs_p
+        sw_simulated_1h.append(radresy.sw_cs_p)
 
         rarad += radresy.ra
-        rahrad += radresy.rah
         rarad1 += radresy1.ra
-        rahrad1 += radresy1.rah
         j+=1
     rsmarr_average.append(rsm_average/23)
     net_rad.append(netrad/23*(0.75+0.00002*elevation))
@@ -339,9 +316,9 @@ while (i<n):
     # print(time1)
     # print(time)
     # print(rsm_average/23)
-    radcaly24.net_radiation_step(radresy24, latitude, time1, time, slope_deg, aspect_deg, tempP1, rhP1, elevation, (rsm_average/23))
+    radcaly24.net_radiation_step(radresy24, latitude, time1, api.deltahours(24), slope_deg, aspect_deg, tempP1, rhP1, elevation, (rsm_average/23))
     # print("swstep: ", radresy24.sw_radiation)
-    swcalc_step24.append(radresy24.sw_radiation)
+    swcalc_step24.append(radresy24.sw_cs_p)
     radcalc_step24.append(radresy24.ra)
     # print("-----------")
     # print(ratheor_int/23)
@@ -353,13 +330,6 @@ while (i<n):
     declin_arr.append(declin*180/math.pi)
     # print("omega1: ", omega1)
     # print("omega2: ", omega2)
-    ra_theor = gsc*dd*(math.sin(declin)*math.sin(lat_rad)*math.cos(slope)*(omega2-omega1)-math.sin(declin)*math.cos(lat_rad)*math.sin(slope)*math.cos(aspect)*(omega2-omega1)+math.cos(declin)*math.cos(lat_rad)*math.cos(slope)*(math.sin(omega2)-math.sin(omega1))+math.cos(declin)*math.sin(lat_rad)*math.sin(slope)*math.cos(aspect)*(math.sin(omega2)-math.sin(omega1))-math.cos(declin)*math.sin(slope)*math.sin(aspect)*(math.cos(omega2)-math.cos(omega1)))
-    # ra_theor =  gsc * dd * (
-    #             math.sin(declin) * math.sin(lat) * math.cos(slope) * (omega2 - omega1)  + math.cos(declin) * math.cos(lat) * math.cos(
-    #         slope) * (math.sin(omega2) - math.sin(omega1)))
-    # print(ra_theor/math.pi/2)
-    # print(dd)
-    rat_rad.append(ra_theor/math.pi/2)
     rah_rad.append(rahrad / 23)
     j = 1
     i+=1

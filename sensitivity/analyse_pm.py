@@ -203,18 +203,36 @@ Rnet_orig_h = [1.441, 1.009, 0.244, 0.229, 0.044, -0.016, -0.015, -0.015, -0.015
 # plt.grid(True)
 # plt.show()
 #
-# # height vegetation
+# height vegetation
+
+dt = 1
+n = 30
+rl = 144
+hveg_array = [0.01, 0.05, 0.1, 0.12, 0.25, 0.5, 1.0, 1.5]
+colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
+i = 0
+for height_veg in hveg_array:
+    result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,rl,height_ws, height_t, elevation,'full')
+    plt.plot(result,colors[i],label=height_veg)
+    i+=1
+
+plt.legend(loc="upper center")
+
+plt.title("Greeley, Colorado, 1-hour time-step, Height_veg dependency")
+plt.grid(True)
+plt.show()
+
+# # effective stimatal resistanse
 #
 # dt = 1
 # n = 30
-# lai = 2.0
 # rl = 144
-# hveg_array = [0.01, 0.05, 0.1, 0.12, 0.25, 0.5, 1.0, 1.5]
-# colors = ('r--','r', 'b--','b','g--','g','k--','k')
+# rl_array = [10, 50, 100, 150, 200,250, 400, 500,1500]
+# colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
 # i = 0
-# for height_veg in hveg_array:
-#     result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,lai,rl,height_ws, height_t, elevation)
-#     plt.plot(result,colors[i],label=height_veg)
+# for rl in rl_array:
+#     result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,rl,height_ws, height_t, elevation,'asce-ewri')
+#     plt.plot(result,colors[i],label=rl)
 #     i+=1
 #
 # plt.legend(loc="upper center")
@@ -222,6 +240,7 @@ Rnet_orig_h = [1.441, 1.009, 0.244, 0.229, 0.044, -0.016, -0.015, -0.015, -0.015
 # plt.title("Greeley, Colorado, 1-hour time-step, Height_veg dependency")
 # plt.grid(True)
 # plt.show()
+
 
 
 # # elevation
@@ -263,21 +282,21 @@ Rnet_orig_h = [1.441, 1.009, 0.244, 0.229, 0.044, -0.016, -0.015, -0.015, -0.015
 # plt.grid(True)
 # plt.show()
 
-# t measurements height
-dt = 1
-n = 30
-lai = 2.0
-rl = 144
-height_t_array = [0.01, 0.1, 0.2, 0.5, 1.0, 1.68, 2.0, 3.0, 5.0]
-colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
-i = 0
-for height_t in height_t_array:
-    result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,lai,rl,height_ws, height_t, elevation)
-    plt.plot(result,colors[i],label=height_t)
-    i+=1
-
-plt.legend(loc="upper center")
-
-plt.title("Greeley, Colorado, 1-hour time-step, Height temperature/rhumidity measurements dependency")
-plt.grid(True)
-plt.show()
+# # t measurements height
+# dt = 1
+# n = 30
+# lai = 2.0
+# rl = 144
+# height_t_array = [0.01, 0.1, 0.2, 0.5, 1.0, 1.68, 2.0, 3.0, 5.0]
+# colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
+# i = 0
+# for height_t in height_t_array:
+#     result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,lai,rl,height_ws, height_t, elevation)
+#     plt.plot(result,colors[i],label=height_t)
+#     i+=1
+#
+# plt.legend(loc="upper center")
+#
+# plt.title("Greeley, Colorado, 1-hour time-step, Height temperature/rhumidity measurements dependency")
+# plt.grid(True)
+# plt.show()
