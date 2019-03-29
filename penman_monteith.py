@@ -207,9 +207,9 @@ for i in range(n):
     # pmc.reference_evapotranspiration_asce_full(pmr,radr.net,tempmean_ts.v[i],rhmean_ts.v[i],elevation,windspeed_ts.v[i])
     pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24),rnet_d_ref[i]/c_MJm2d2Wm2*0.0036,  tempmax_ts.v[i],  tempmin_ts.v[i], rhmean_ts.v[i], elevation,
                                                windspeed_ts.v[i])
-    pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24), rnet_d_ref[i] / c_MJm2d2Wm2 * 0.0036,
-                                               tempmax_ts.v[i], tempmin_ts.v[i], rhmean_ts.v[i], elevation,
-                                               windspeed_ts.v[i])
+    # pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24), rnet_d_ref[i] / c_MJm2d2Wm2 * 0.0036,
+    #                                            tempmax_ts.v[i], tempmin_ts.v[i], rhmean_ts.v[i], elevation,
+    #                                            windspeed_ts.v[i])
 
     # pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24), radr.net*c_MJm2d2Wm2, tempmax_ts.v[i],
     #                                            tempmin_ts.v[i], rhmean_ts.v[i], elevation,
@@ -218,7 +218,7 @@ for i in range(n):
     print("======================")
     print("ET_ref: ", pmr.et_ref)
     print("G: ", pmr.soil_heat)
-    ET_ref_sim_d.append(pmr.et_ref*24) # the outut of et-routine now is in mm/h, here convert to mm/d
+    ET_ref_sim_d.append(pmr.et_ref) # the outut of et-routine now is in mm/h, here convert to mm/d
     ET_sim_st_d.append(pmrst.et_ref*24)
     doy.append(day1+1)
     day1+=1
