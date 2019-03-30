@@ -64,7 +64,7 @@ height_ws = 3 # height of anemometer
 height_t = 1.68 # height of air temperature and rhumidity measurements
 surface_type = "irrigated grass"
 height_veg = 0.12 #vegetation height
-# height_veg = 0.5 #vegetation height
+height_veg = 0.5 #vegetation height
 atm_pres_mean = 85.17 #[kPa]
 psychrom_const = 0.0566
 windspeed_adj = 0.921
@@ -72,7 +72,7 @@ lat_rad = latitude*math.pi/180
 slope_deg = 0.0
 aspect_deg = 0.0
 rl = 100.8 #short crop
-# rl = 275
+rl = 275
 #
 
 print(" --------------------------------------------------------- ")
@@ -207,7 +207,7 @@ for i in range(n):
     # pmc.reference_evapotranspiration_asce_full(pmr,radr.net,tempmean_ts.v[i],rhmean_ts.v[i],elevation,windspeed_ts.v[i])
     pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24),rnet_d_ref[i]/c_MJm2d2Wm2*0.0036,  tempmax_ts.v[i],  tempmin_ts.v[i], rhmean_ts.v[i], elevation,
                                                windspeed_ts.v[i])
-    # pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24), rnet_d_ref[i] / c_MJm2d2Wm2 * 0.0036,
+    # pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24), rnet_d_ref[i],
     #                                            tempmax_ts.v[i], tempmin_ts.v[i], rhmean_ts.v[i], elevation,
     #                                            windspeed_ts.v[i])
 
@@ -218,6 +218,7 @@ for i in range(n):
     print("======================")
     print("ET_ref: ", pmr.et_ref)
     print("G: ", pmr.soil_heat)
+    # ET_ref_sim_d.append(pmr.et_ref)
     ET_ref_sim_d.append(pmr.et_ref) # the outut of et-routine now is in mm/h, here convert to mm/d
     ET_sim_st_d.append(pmrst.et_ref*24)
     doy.append(day1+1)
@@ -294,7 +295,8 @@ slope_deg = 0.0
 aspect_deg = 0.0
 lai = 8.0
 rl = 72.0 # short
-rl = 180.2 #tall crop
+# rl  = 36.9
+# rl = 180.2 #tall crop
 
 
 
@@ -420,7 +422,7 @@ for i in range(nhour-1):
     # pmch.reference_evapotranspiration_asce_full(pmrh, radrh.net * c_MJm2h2Wm2,temph_ts.v[i], rhh_ts.v[i], elevation, windspeedh_ts.v[i])
     pmch.reference_evapotranspiration_asce_full(pmrh, api.deltahours(1),Rnet_orig_h[i], temph_ts.v[i],temph_ts.v[i],  rhh_ts.v[i], elevation,windspeedh_ts.v[i])
 
-    # print("======================")
+    print("======================")
     # print("ET_ref: ", pmrh.et_ref)
     ET_ref_sim_h.append(pmrh.et_ref)
     ET_sim_st_h.append(pmrhst.et_ref)
@@ -520,7 +522,7 @@ fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
 # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
 ax1.plot(timeofday, ET_rs_h, 'b.-', label='ET_rs-verification-set,'+crop+'-crop') #tall
-# ax1.plot(timeofday, ET_os_h, 'b.-', label='ET_os-verification-set,'+crop+' crop') #short
+ax1.plot(timeofday, ET_os_h, 'b.-', label='ET_os-verification-set,'+crop+' crop') #short
 ax1.plot(timeofday, ET_ref_sim_h, 'ro-', label='ET_sim_pm full')
 ax1.plot(timeofday, ET_sim_st_h, 'yo-', label='ET_sim_pm st')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')

@@ -207,7 +207,7 @@ Rnet_orig_h = [1.441, 1.009, 0.244, 0.229, 0.044, -0.016, -0.015, -0.015, -0.015
 
 dt = 1
 n = 30
-rl = 144
+rl = 72
 hveg_array = [0.01, 0.05, 0.1, 0.12, 0.25, 0.5, 1.0, 1.5]
 colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
 i = 0
@@ -222,24 +222,25 @@ plt.title("Greeley, Colorado, 1-hour time-step, Height_veg dependency")
 plt.grid(True)
 plt.show()
 
-# # effective stimatal resistanse
-#
-# dt = 1
-# n = 30
-# rl = 144
-# rl_array = [10, 50, 100, 150, 200,250, 400, 500,1500]
-# colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
-# i = 0
-# for rl in rl_array:
-#     result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,rl,height_ws, height_t, elevation,'asce-ewri')
-#     plt.plot(result,colors[i],label=rl)
-#     i+=1
-#
-# plt.legend(loc="upper center")
-#
-# plt.title("Greeley, Colorado, 1-hour time-step, Height_veg dependency")
-# plt.grid(True)
-# plt.show()
+# effective stimatal resistanse
+
+dt = 1
+n = 30
+rl = 144
+height_veg = 0.5
+rl_array = [10, 50, 100, 150, 200,250, 400, 500,1500]
+colors = ('r--','r', 'b--','b','g--','g','k--','k','m--','m')
+i = 0
+for rl in rl_array:
+    result = run_pm.run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, Rnet_orig_h, height_veg,dt, n,rl,height_ws, height_t, elevation,'full')
+    plt.plot(result,colors[i],label=rl)
+    i+=1
+
+plt.legend(loc="upper center")
+
+plt.title("Greeley, Colorado, 1-hour time-step, stomatal resistance dependency")
+plt.grid(True)
+plt.show()
 
 
 

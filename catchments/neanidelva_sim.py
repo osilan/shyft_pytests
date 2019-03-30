@@ -96,51 +96,51 @@ print(u"Calibrated rain/snow threshold temp: {} C".format(parameters.gs.tx)) # p
 calib.optimizer.calculate_goal_function(result_params) # reset the parameters to the values of the calibration
 parameters.gs.tx = 4.0 # setting a higher value for tx
 s_init = state.extract_state([])
-# type(state)
-# s0=state_repos.get_state(0)
-# s0.state_vector
-# state.apply_state(s0, [])
-# calib.run(state=s_init) # rerun the model, with new parameter
-# disch_sim_p_high = calib.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
-# parameters.gs.tx = -4.0 # setting a higher value for tx
+type(state)
+s0=state_repos.get_state(0)
+s0.state_vector
+state.apply_state(s0, [])
+calib.run(state=s_init) # rerun the model, with new parameter
+disch_sim_p_high = calib.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
+parameters.gs.tx = -4.0 # setting a higher value for tx
+
+calib.run(state=s_init) # rerun the model, with new parameter
+
+ts_timestamps = [dt.datetime.utcfromtimestamp(p.start) for p in target_obs.ts.time_axis]
+disch_sim_p_low = calib.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
+fig, ax = plt.subplots(1, figsize=(15,10))
+ax.plot(ts_timestamps, disch_sim.values, lw=2, label = "calib")
+ax.plot(ts_timestamps, disch_sim_p_high.values, lw=2, label = "high")
+ax.plot(ts_timestamps, disch_sim_p_low.values, lw=2, label = "low")
+ax.plot(ts_timestamps, disch_obs, lw=2, ls='--', label = "obs")
+ax.set_title("investigating parameter gs.tx")
+ax.legend()
+ax.set_ylabel("discharge [m3 s-1]")
+
+plt.show()
 #
-# calib.run(state=s_init) # rerun the model, with new parameter
-#
-# ts_timestamps = [dt.datetime.utcfromtimestamp(p.start) for p in target_obs.ts.time_axis]
-# disch_sim_p_low = calib.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
-# fig, ax = plt.subplots(1, figsize=(15,10))
-# ax.plot(ts_timestamps, disch_sim.values, lw=2, label = "calib")
-# ax.plot(ts_timestamps, disch_sim_p_high.values, lw=2, label = "high")
-# ax.plot(ts_timestamps, disch_sim_p_low.values, lw=2, label = "low")
-# ax.plot(ts_timestamps, disch_obs, lw=2, ls='--', label = "obs")
-# ax.set_title("investigating parameter gs.tx")
-# ax.legend()
-# ax.set_ylabel("discharge [m3 s-1]")
-#
-# plt.show()
-# #
-# s_init = state.extract_state([])
+s_init = state.extract_state([])
 
 # reset the max water parameter
-# parameters.gs.max_water = 1.0 # setting a higher value for tx
-# calib.run(state=s_init) # rerun the model, with new parameter
-# disch_sim_p_high = calib.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
-#
-# parameters.gs.max_water = .001 # setting a higher value for tx
-# calib.run(state=s_init) # rerun the model, with new parameter
-# disch_sim_p_low = calib.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
-#
-# # plot the results
-# fig, ax = plt.subplots(1, figsize=(15,10))
-# ax.plot(ts_timestamps, disch_sim.values, lw=2, label = "calib")
-# ax.plot(ts_timestamps, disch_sim_p_high.values, lw=2, label = "high")
-# ax.plot(ts_timestamps, disch_sim_p_low.values, lw=2, label = "low")
-# ax.plot(ts_timestamps, disch_obs, lw=2, ls='--', label = "obs")
-# ax.set_title("investigating parameter gs.max_water")
-# ax.legend()
-# ax.set_ylabel("discharge [m3 s-1]")
-#
-# plt.show()
+parameters.gs.max_water = 1.0 # setting a higher value for tx
+calib.run(state=s_init) # rerun the model, with new parameter
+disch_sim_p_high = calib.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
+
+parameters.gs.max_water = .001 # setting a higher value for tx
+calib.run(state=s_init) # rerun the model, with new parameter
+disch_sim_p_low = calib.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
+
+# plot the results
+fig, ax = plt.subplots(1, figsize=(15,10))
+ax.plot(ts_timestamps, disch_sim.values, lw=2, label = "calib")
+ax.plot(ts_timestamps, disch_sim_p_high.values, lw=2, label = "high")
+ax.plot(ts_timestamps, disch_sim_p_low.values, lw=2, label = "low")
+ax.plot(ts_timestamps, disch_obs, lw=2, ls='--', label = "obs")
+ax.set_title("investigating parameter gs.max_water")
+ax.legend()
+ax.set_ylabel("discharge [m3 s-1]")
+
+plt.show()
 
 simulator.run(state=s_init)
 
