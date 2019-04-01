@@ -43,7 +43,7 @@ time = api.utctime_now()
 radcal.net_radiation(radresponse, 40.4, time, 0.0, 0.0, 20.0, 40.0, 150.0, 0.0);
 print(radresponse.net)
 
-pmparam=api.PenmanMonteithParameter(0.12,2.0,2.0, 144.0)
+pmparam=api.PenmanMonteithParameter(0.12,2.0,2.0, 144.0, 0)
 pmcalculator=api.PenmanMonteithCalculator(pmparam)
 pmresponse =api.PenmanMonteithResponse()
 
@@ -52,7 +52,7 @@ rhumidity = 40.0
 elevation = 150.0
 windspeed = 1.0
 
-pmcalculator.reference_evapotranspiration_asce_full(pmresponse,api.deltahours(24),radresponse.net,temperature,temperature,rhumidity,elevation,windspeed)
+pmcalculator.reference_evapotranspiration(pmresponse,api.deltahours(24),radresponse.net,temperature,temperature,rhumidity,elevation,windspeed)
 print(pmresponse.et_ref)
 
 
@@ -64,15 +64,15 @@ height_ws = 3 # height of anemometer
 height_t = 1.68 # height of air temperature and rhumidity measurements
 surface_type = "irrigated grass"
 height_veg = 0.12 #vegetation height
-height_veg = 0.5 #vegetation height
+# height_veg = 0.5 #vegetation height
 atm_pres_mean = 85.17 #[kPa]
 psychrom_const = 0.0566
 windspeed_adj = 0.921
 lat_rad = latitude*math.pi/180
 slope_deg = 0.0
 aspect_deg = 0.0
-rl = 100.8 #short crop
-rl = 275
+rl = 100.8 #short crop 100.35 for tall crop
+
 #
 
 print(" --------------------------------------------------------- ")
@@ -163,8 +163,10 @@ radc = api.RadiationCalculator(radp)
 radr =api.RadiationResponse()
 # pmp=api.PenmanMonteithParameter(lai,height_ws,height_t)
 
-pmp=api.PenmanMonteithParameter(height_veg,height_ws,height_t,rl)
+pmp=api.PenmanMonteithParameter(height_veg,height_ws,height_t,rl,1)
 pmc=api.PenmanMonteithCalculator(pmp)
+pmpst=api.PenmanMonteithParameter(height_veg,height_ws,height_t,rl,0)
+pmcst=api.PenmanMonteithCalculator(pmpst)
 pmr =api.PenmanMonteithResponse()
 pmrst =api.PenmanMonteithResponse()
 
@@ -200,22 +202,19 @@ for i in range(n):
     # print("LW: ", radr.net_lw*c_MJm2d2Wm2)
     lw_sim_d.append(radr.net_lw*c_MJm2d2Wm2)
     # print("RNet: ", radr.net*c_MJm2d2Wm2 )
-    # pmc.reference_evapotranspiration_asce_st(pmrst, api.deltahours(24), radr.net * c_MJm2h2Wm2, tempmin_ts.v[i],
+    # pmcst.reference_evapotranspiration(pmrst, api.deltahours(24), radr.net * c_MJm2h2Wm2, tempmin_ts.v[i],
                                              # tempmax_ts.v[i], rhmean_ts.v[i], elevation,windspeed_ts.v[i])
-    pmc.reference_evapotranspiration_asce_st(pmrst, api.deltahours(24),rnet_d_ref[i]/c_MJm2d2Wm2*0.0036, tempmax_ts.v[i],  tempmin_ts.v[i],  rhmean_ts.v[i], elevation,
+    pmcst.reference_evapotranspiration(pmrst, api.deltahours(24),rnet_d_ref[i]/c_MJm2d2Wm2*0.0036, tempmax_ts.v[i],  tempmin_ts.v[i],  rhmean_ts.v[i], elevation,
                                              windspeed_ts.v[i]) #expected input of routine is MJ/m^2/hour
     # pmc.reference_evapotranspiration_asce_full(pmr,radr.net,tempmean_ts.v[i],rhmean_ts.v[i],elevation,windspeed_ts.v[i])
-    pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24),rnet_d_ref[i]/c_MJm2d2Wm2*0.0036,  tempmax_ts.v[i],  tempmin_ts.v[i], rhmean_ts.v[i], elevation,
+    pmc.reference_evapotranspiration(pmr, api.deltahours(24),rnet_d_ref[i]/c_MJm2d2Wm2*0.0036,  tempmax_ts.v[i],  tempmin_ts.v[i], rhmean_ts.v[i], elevation,
                                                windspeed_ts.v[i])
-    # pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24), rnet_d_ref[i],
-    #                                            tempmax_ts.v[i], tempmin_ts.v[i], rhmean_ts.v[i], elevation,
-    #                                            windspeed_ts.v[i])
 
-    # pmc.reference_evapotranspiration_asce_full(pmr, api.deltahours(24), radr.net*c_MJm2d2Wm2, tempmax_ts.v[i],
+    # pmc.reference_evapotranspiration(pmr, api.deltahours(24), radr.net*c_MJm2d2Wm2, tempmax_ts.v[i],
     #                                            tempmin_ts.v[i], rhmean_ts.v[i], elevation,
     #                                            windspeed_ts.v[i])
 
-    print("======================")
+    # print("======================")
     print("ET_ref: ", pmr.et_ref)
     print("G: ", pmr.soil_heat)
     # ET_ref_sim_d.append(pmr.et_ref)
@@ -224,7 +223,7 @@ for i in range(n):
     doy.append(day1+1)
     day1+=1
     # print(tadays.time(i)," || ", radr.net_radiation*c_MJm2d2Wm2," || ", pmr.et_ref," || ", ET_os_daily[i]," || ", ET_rs_daily[i], " || ")
-    print("======================")
+    # print("======================")
 
 # # Let's plot the data we received from HbvSnow
 # fig, ax1 = plt.subplots(figsize=(7,5))
@@ -282,7 +281,7 @@ height_ws = 3 # height of anemometer
 height_t = 1.68 # height of air temperature and rhumidity measurements
 surface_type = "irrigated grass"
 height_veg = 0.12 #vegetation height
-# height_veg = 0.5 #tall
+height_veg = 0.5 #tall
 if height_veg>0.12:
     crop="tall"
 else:
@@ -295,8 +294,7 @@ slope_deg = 0.0
 aspect_deg = 0.0
 lai = 8.0
 rl = 72.0 # short
-# rl  = 36.9
-# rl = 180.2 #tall crop
+# rl = 66.9 #tall crop
 
 
 
@@ -374,8 +372,10 @@ radph = api.RadiationParameter(0.2,1.0)
 radch = api.RadiationCalculator(radph)
 radrh =api.RadiationResponse()
 # pmph=api.PenmanMonteithParameter(lai,height_ws,height_t)
-pmph=api.PenmanMonteithParameter(height_veg,height_ws,height_t, rl)
+pmph=api.PenmanMonteithParameter(height_veg,height_ws,height_t, rl,True)
 pmch=api.PenmanMonteithCalculator(pmph)
+pmphst=api.PenmanMonteithParameter(height_veg,height_ws,height_t, rl,False)
+pmchst=api.PenmanMonteithCalculator(pmphst)
 pmrh =api.PenmanMonteithResponse()
 pmrhst =api.PenmanMonteithResponse()
 
@@ -396,42 +396,23 @@ Ra_sim_h = []
 Rnet_sim_h = []
 
 for i in range(nhour-1):
-    # print(i)
-    # print("======================")
-    # print("time: ", tah.time(i))
     timeofday.append(datetime.fromtimestamp(tah.time(i)))
-    # print(datetime.fromtimestamp(tah.time(i)))
-    # print("Th: ", temph_ts.v[i])
-    # print("RHh: ", rhh_ts.v[i])
     radch.net_radiation_step_asce_st(radrh, latitude, tah.time(i), api.deltahours(1),slope_deg, aspect_deg, temph_ts.v[i], rhh_ts.v[i], elevation, rsh_ts.v[i]/c_MJm2h2Wm2 )
-    # radch.net_radiation_step(radrh, latitude, tah.time(i), api.deltahours(1), slope_deg, aspect_deg, temph_ts.v[i],rhh_ts.v[i], elevation, rsh_ts.v[i] / c_MJm2h2Wm2)
-    # print("Ra: ", radrh.ra*c_MJm2h2Wm2)
     Ra_sim_h.append(radrh.ra*c_MJm2h2Wm2*24 )
-    # print("Rs input:", rsh_ts.v[i]/c_MJm2h2Wm2)
-    # print("Rso: ", radrh.sw_t)
     Rso_sim_h.append(radrh.sw_t * c_MJm2h2Wm2)
     SW_sim_h.append(radrh.sw_t*c_MJm2h2Wm2)
-    # print("LW: ", radrh.net_lw*c_MJm2h2Wm2)
     LW_sim_h.append(radrh.net_lw*c_MJm2h2Wm2)
-    # print("RNet: ", radrh.net*c_MJm2h2Wm2 )
-    # Rnet_sim_h.append(radrh.net*c_MJm2h2Wm2*(0.75+0.00002*elevation))
     Rnet_sim_h.append(radrh.net * c_MJm2h2Wm2 )
-    pmch.reference_evapotranspiration_asce_st(pmrhst,api.deltahours(1),Rnet_orig_h[i],temph_ts.v[i],temph_ts.v[i],rhh_ts.v[i],elevation,windspeedh_ts.v[i])
+    pmchst.reference_evapotranspiration(pmrhst,api.deltahours(1),Rnet_orig_h[i],temph_ts.v[i],temph_ts.v[i],rhh_ts.v[i],elevation,windspeedh_ts.v[i])
     # pmch.reference_evapotranspiration_asce_st(pmrhst, api.deltahours(1),radrh.net * c_MJm2h2Wm2 ,temph_ts.v[i], temph_ts.v[i],rhh_ts.v[i], elevation, windspeedh_ts.v[i])
     # pmch.reference_evapotranspiration_asce_full(pmrh,radrh.net*c_MJm2h2Wm2*(0.75+0.00002*elevation),temph_ts.v[i],rhh_ts.v[i],elevation,windspeedh_ts.v[i])
     # pmch.reference_evapotranspiration_asce_full(pmrh, radrh.net * c_MJm2h2Wm2,temph_ts.v[i], rhh_ts.v[i], elevation, windspeedh_ts.v[i])
-    pmch.reference_evapotranspiration_asce_full(pmrh, api.deltahours(1),Rnet_orig_h[i], temph_ts.v[i],temph_ts.v[i],  rhh_ts.v[i], elevation,windspeedh_ts.v[i])
-
-    print("======================")
-    # print("ET_ref: ", pmrh.et_ref)
+    pmch.reference_evapotranspiration(pmrh, api.deltahours(1),Rnet_orig_h[i], temph_ts.v[i],temph_ts.v[i],  rhh_ts.v[i], elevation,windspeedh_ts.v[i])
     ET_ref_sim_h.append(pmrh.et_ref)
     ET_sim_st_h.append(pmrhst.et_ref)
-    # print("======================")
     # ET_pt_sim_h.append(ptc.potential_evapotranspiration(temph_ts.v[i], radrh.rnet, rhh_ts.v[i]*0.01)*3600) # the PT calculates [mm/s]
     ET_pt_sim_h.append(ptc.potential_evapotranspiration(temph_ts.v[i], ws_Rsh[i]/c_MJm2h2Wm2,rhh_ts.v[i] * 0.01) * 3600)  # the PT calculates [mm/s]
-    # print(ET_pt_sim_h[i])
-
-summary = 0
+    summary = 0
 for i in range(len(ET_ref_sim_h)):
     summary+=math.fabs(ET_ref_sim_h[i]-ET_sim_st_h[i])
 

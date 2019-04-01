@@ -147,9 +147,9 @@ simulator.run(state=s_init)
 ts_timestamps = [dt.datetime.utcfromtimestamp(p.start) for p in target_obs.ts.time_axis]
 disch_sim = simulator.region_model.statistics.discharge(target_obs.catchment_indexes) # fetch discharge ts
 fig, ax = plt.subplots(1, figsize=(15,10))
-ax.plot(ts_timestamps, disch_sim.values, lw=2, label = "calib")
+ax.plot(ts_timestamps, disch_sim.values, lw=2, label = "sim")
 ax.plot(ts_timestamps, disch_obs, lw=2, ls='--', label = "obs")
-ax.set_title("investigating parameter gs.tx")
+ax.set_title("simulator run")
 ax.legend()
 ax.set_ylabel("discharge [m3 s-1]")
 

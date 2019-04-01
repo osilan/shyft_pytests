@@ -55,8 +55,11 @@ def run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, rnet, height_veg=0.12,dt
     radph = api.RadiationParameter(0.26,1.0)
     radch = api.RadiationCalculator(radph)
     radrh =api.RadiationResponse()
-    # pmph=api.PenmanMonteithParameter(lai,height_ws,height_t)
-    pmph=api.PenmanMonteithParameter(height_veg,height_ws,height_t, rl)
+    if method=='asce-ewri':
+        full_model = False
+    else:
+        full_model = True
+    pmph=api.PenmanMonteithParameter(height_veg,height_ws,height_t, rl, full_model)
     pmch=api.PenmanMonteithCalculator(pmph)
     pmrh =api.PenmanMonteithResponse()
 
@@ -67,18 +70,12 @@ def run_pm(ws_Th, ws_eah, ws_Rsh, ws_windspeedh,ws_rhh, rnet, height_veg=0.12,dt
 
     ET_ref_sim_h= []
 
-    if method=='asce-ewri':
-
-        for i in range(n-1):
-             pmch.reference_evapotranspiration_asce_st(pmrh, step,rnet[i], temph_ts.v[i],temph_ts.v[i],
+    for i in range(n-1):
+        pmch.reference_evapotranspiration(pmrh, step,rnet[i], temph_ts.v[i],temph_ts.v[i],
                                                       rhh_ts.v[i], elevation, windspeedh_ts.v[i])
-             ET_ref_sim_h.append(pmrh.et_ref)
+        ET_ref_sim_h.append(pmrh.et_ref)
 
-    else:
-        for i in range(n - 1):
-            pmch.reference_evapotranspiration_asce_full(pmrh, step,rnet[i], temph_ts.v[i], temph_ts.v[i], rhh_ts.v[i],
-                                                        elevation, windspeedh_ts.v[i])
-            ET_ref_sim_h.append(pmrh.et_ref)
+
 
 
     return ET_ref_sim_h
