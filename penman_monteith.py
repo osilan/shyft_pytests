@@ -261,7 +261,7 @@ ax1.plot(doy, ET_ref_sim_d, 'ro-', label='ET_sim')
 ax1.plot(doy, ET_sim_st_d, 'yo-', label='ET_sim_st')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
 ax1.plot(doy, ET_os_daily, 'g.-', label='ET_os -- short crop')
-ax1.plot(doy, ET_rs_daily, 'b.-', label='ET_rs -- tall crop')
+# ax1.plot(doy, ET_rs_daily, 'b.-', label='ET_rs -- tall crop')
 
 ax1.set_ylabel('ET_sim, ET_os, ET_rs [mm/day]')
 # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
@@ -419,7 +419,7 @@ for i in range(len(ET_ref_sim_h)):
 mae = (math.sqrt(summary/len(ET_ref_sim_h)))
 print('MAE:' + str(mae))
 # Let's plot the data we received from HbvSnow
-# #
+#
 # fig, ax1 = plt.subplots(figsize=(7,5))
 # ax1.plot(timeofday, ws_Rsh[0:29], 'ro-', label='WS Rsh')
 # # ax1.plot(timeofday, Rnet_orig_h, 'g.-', label='Rnet_orig')
@@ -476,34 +476,34 @@ print('MAE:' + str(mae))
 # plt.legend(loc="upper left")
 # # plt.axis([0,365,0,10])
 # plt.grid(True)
-
-#
-#
 #
 
-# fig, ax1 = plt.subplots(figsize=(7,5))
-# # ax2 = ax1.twinx()
-# # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
-# ax1.plot(timeofday, ET_ref_sim_h, 'ro-', label='ET_sim_pm')
-# # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
-# ax1.plot(timeofday, ET_os_h, 'g.-', label='ET_os')
-# ax1.plot(timeofday, ET_rs_h, 'b.-', label='ET_rs')
-# ax1.plot(timeofday, ET_pt_sim_h, 'k.-', label='ET_sim_pt')
-#
-# ax1.set_ylabel('ET_sim, ET_os, ET_rs [mm/h]')
-# # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
-# ax1.set_xlabel('DOY')
-# plt.title("Greeley, Colorado, daily time-step")
-# plt.legend(loc="upper left")
-# # plt.axis([0,365,0,10])
-# plt.grid(True)
-# plt.show()
+
+
+
+fig, ax1 = plt.subplots(figsize=(7,5))
+# ax2 = ax1.twinx()
+# ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
+ax1.plot(timeofday, ET_ref_sim_h, 'ro-', label='ET_sim_pm')
+# ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
+ax1.plot(timeofday, ET_os_h, 'g.-', label='ET_os')
+ax1.plot(timeofday, ET_rs_h, 'b.-', label='ET_rs')
+ax1.plot(timeofday, ET_pt_sim_h, 'k.-', label='ET_sim_pt')
+
+ax1.set_ylabel('ET_sim, ET_os, ET_rs [mm/h]')
+# ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
+ax1.set_xlabel('DOY')
+plt.title("Greeley, Colorado, daily time-step")
+plt.legend(loc="upper left")
+# plt.axis([0,365,0,10])
+plt.grid(True)
+plt.show()
 
 fig, ax1 = plt.subplots(figsize=(7,5))
 # ax2 = ax1.twinx()
 # ax1.plot(doy, rat_rad, 'g.-', label='Ratheor-integral')
 ax1.plot(timeofday, ET_rs_h, 'b.-', label='ET_rs-verification-set,'+crop+'-crop') #tall
-ax1.plot(timeofday, ET_os_h, 'b.-', label='ET_os-verification-set,'+crop+' crop') #short
+# ax1.plot(timeofday, ET_os_h, 'b.-', label='ET_os-verification-set,'+crop+' crop') #short
 ax1.plot(timeofday, ET_ref_sim_h, 'ro-', label='ET_sim_pm full')
 ax1.plot(timeofday, ET_sim_st_h, 'yo-', label='ET_sim_pm st')
 # ax1.plot(doy, radtheorint_arr, 'y', label='Rso')
@@ -523,11 +523,11 @@ plt.show()
 
 fig, ax1 = plt.subplots(figsize=(7,5))
 ax1.plot(ET_sim_st_h, ET_ref_sim_h, 'ro', label='ET_sim_pm-quantile')
-ax1.plot(ET_sim_st_h, ET_sim_st_h, 'k')
+ax1.plot(ET_ref_sim_h, ET_ref_sim_h, 'k')
 
 ax1.set_ylabel('ET_sim_full [mm/h]')
 # ax2.set_ylabel('extraterrestrial radiation (Ra), [W/m^2]')
-ax1.set_xlabel('ET_sim)st')
+ax1.set_xlabel('ET_sim_st')
 plt.title("Greeley, Colorado, hourly time-step")
 plt.legend(loc="upper left")
 # plt.axis([0,365,0,10])

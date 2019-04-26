@@ -4,6 +4,7 @@ import datetime as dt
 import numpy as np
 import math
 from matplotlib import pyplot as plt
+import shyft
 from shyft import api
 import time
 
@@ -11,6 +12,9 @@ import time
 from shyft.repository.default_state_repository import DefaultStateRepository
 from shyft.orchestration.configuration.yaml_configs import YAMLCalibConfig, YAMLSimConfig
 from shyft.orchestration.simulators.config_simulator import ConfigCalibrator, ConfigSimulator
+from shyft.repository.netcdf import cf_ts_repository
+from shyft.repository.netcdf import cf_region_model_repository
+from shyft.repository.netcdf import cf_geo_ts_repository
 
 start_sim = time.time()
 # conduct a configured simulation first.

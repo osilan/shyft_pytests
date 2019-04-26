@@ -12,8 +12,8 @@ from shyft.orchestration.configuration.yaml_configs import YAMLCalibConfig, YAML
 from shyft.orchestration.simulators.config_simulator import ConfigCalibrator, ConfigSimulator
 
 # conduct a configured simulation first.
-# config_file_path = '/home/olga/workspace/shyft-data/narayani/yaml_config-rpmgsk/narayani_simulation.yaml'
-config_file_path = '/home/olga/workspace/shyft-data/narayani/yaml_config-ptgsk/narayani_simulation.yaml'
+config_file_path = '/home/olga/workspace/shyft-data/narayani/yaml_config-rpmgsk/narayani_simulation.yaml'
+# config_file_path = '/home/olga/workspace/shyft-data/narayani/yaml_config-ptgsk/narayani_simulation.yaml'
 cfg = YAMLSimConfig(config_file_path, "narayani")
 simulator = ConfigSimulator(cfg)
 # run the model, and we'll just pull the `api.model` from the `simulator`
@@ -22,8 +22,8 @@ state = simulator.region_model.state
 
 
 
-# config_file_path = '/home/olga/workspace/shyft-data/narayani/yaml_config-rpmgsk/narayani_calibration.yaml' # here is the *.yaml file
-config_file_path = '/home/olga/workspace/shyft-data/narayani/yaml_config-ptgsk/narayani_calibration.yaml' # here is the *.yaml file
+config_file_path = '/home/olga/workspace/shyft-data/narayani/yaml_config-rpmgsk/narayani_calibration.yaml' # here is the *.yaml file
+# config_file_path = '/home/olga/workspace/shyft-data/narayani/yaml_config-ptgsk/narayani_calibration.yaml' # here is the *.yaml file
 cfg = YAMLCalibConfig(config_file_path, "narayani")
 # config_file_path = '/home/olga/workspace/shyft-data/neanidelv/yaml_config/neanidelva_simulation.yaml' # here is the *.yaml file
 # cfg = YAMLSimConfig(config_file_path, "neanidelva")
